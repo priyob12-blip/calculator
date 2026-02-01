@@ -71,15 +71,14 @@ if shape == "Trapesium":
                                  (math.pi * ((d_tanks[i]/2)**2) * max(0, tinggi_dinding - t_pondasis[i]))
             
             vol_efektif_bund = vol_bruto - vol_pond_tank
-            
-if vol_efektif_bund < kapasitas_tank_besar * 1.1:
-    # Baris 76 (Gunakan 4 spasi atau 1 Tab)
-    status = "✗ NON COMPLY - Volume bund kurang"
-elif tinggi_dinding_bund > 1.8:
-    # Harus sejajar dengan status di atas
-    status = "✗ NON COMPLY - Tinggi dinding > 1,8 m"
-else:
-    status = "✓ COMPLY - AMAN"
+
+            if vol_pond_tank < vol_efektif_bund:
+                status = "✗ NON COMPLY - Volume bund kurang"
+            elif tinggi_dinding > 1.8:
+                status = "✗ NON COMPLY - Tinggi dinding > 1,8 m"
+            else:
+                status = "✓ COMPLY - AMAN" if vol_efektif_bund < kapasitas_tank_besar * 1.1 else "CHECK DATA"
+
             
             c15 = d_tanks[0]
             c19 = d_tanks[1] if len(d_tanks)>1 else c15
