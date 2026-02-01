@@ -77,7 +77,7 @@ if shape == "Trapesium":
             elif tinggi_dinding > 1.8:
                 status = "✗ NON COMPLY - Tinggi dinding > 1,8 m"
             else:
-                status = "✓ COMPLY - AMAN" if kapasitas_tank_besar*110% <= vol_efektif_bund else "CHECK DATA"
+                status = "✓ COMPLY - AMAN" if kapasitas_tank_besar * 1.1 <= vol_efektif_bund else "CHECK DATA"
             
             c15 = d_tanks[0]
             c19 = d_tanks[1] if len(d_tanks)>1 else c15
@@ -150,7 +150,7 @@ else:  # Persegi
             elif tinggi_dinding > 1.8:
                 status = "✗ NON COMPLY - Tinggi dinding > 1,8 m"
             else:
-                status = "✓ COMPLY - AMAN" if kapasitas_tank_besar*110% <= vol_efektif_bund else "CHECK DATA"
+                status = "✓ COMPLY - AMAN" if kapasitas_tank_besar * 1.1 <= vol_efektif_bund else "CHECK DATA"
             
             c15 = d_tanks[0]
             c19 = d_tanks[1] if len(d_tanks)>1 else c15
