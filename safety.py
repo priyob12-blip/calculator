@@ -113,8 +113,8 @@ else:  # Persegi
     tinggi_dinding = number_input_zero("Tinggi Dinding (m)", "t_per")
     
     col4, col5 = st.columns(2)
-    lebar_dinding1 = number_input_zero("Lebar Dinding  (m)", "ld1_per")
-    Panjang_dinding2 = number_input_zero("Panjang Dinding  (m)", "ld2_per")
+    lebar_dinding = number_input_zero("Lebar Dinding  (m)", "ld1_per")
+    Panjang_dinding = number_input_zero("Panjang Dinding  (m)", "ld2_per")
     
     kapasitas_tank_besar = number_input_zero("Kapasitas Tangki Terbesar (KL)", "kap_per")
     
