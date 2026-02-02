@@ -77,7 +77,7 @@ if shape == "Trapesium":
             if tinggi_dinding > 1.8:
                 status = "✗ NON COMPLY - Tinggi dinding > 1,8 m"
             else:
-                status = "✓ COMPLY - AMAN" if vol_efektif_bund > kapasitas_tank_besar * 1.1 else "CHECK DATA"
+                status = "✓ COMPLY - AMAN" if vol_efektif_bund > kapasitas_tank_besar * 1.1 
 
             
             c15 = d_tanks[0]
