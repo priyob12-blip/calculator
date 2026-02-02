@@ -113,8 +113,8 @@ else:  # Persegi
     tinggi_dinding = number_input_zero("Tinggi Dinding (m)", "t_per")
     
     col4, col5 = st.columns(2)
-    lebar_dinding1 = number_input_zero("Lebar Dinding 1 (m)", "ld1_per")
-    Panjang_dinding2 = number_input_zero("Lebar Dinding 2 (m)", "ld2_per")
+    lebar_dinding1 = number_input_zero("Lebar Dinding  (m)", "ld1_per")
+    Panjang_dinding2 = number_input_zero("Panjang Dinding  (m)", "ld2_per")
     
     kapasitas_tank_besar = number_input_zero("Kapasitas Tangki Terbesar (KL)", "kap_per")
     
@@ -137,7 +137,7 @@ else:  # Persegi
         if panjang == 0 or lebar == 0:
             st.warning("⚠️ Masukkan data bundwall terlebih dahulu!")
         else:
-            vol_bruto = tinggi_dinding * (panjang - 2*lebar_dinding1) * (lebar - 2*Panjang_dinding2)
+            vol_bruto = tinggi_dinding * (panjang - 2*lebar_dinding) * (lebar - 2*Panjang_dinding)
             
             vol_pond_tank = 0
             for i in range(5):
