@@ -72,9 +72,8 @@ if shape == "Trapesium":
             
             vol_efektif_bund = vol_bruto - vol_pond_tank
 
-            if vol_pond_tank < vol_efektif_bund:
-                status = "✗ COMPLY - Volume bund kurang"
-            elif tinggi_dinding > 1.8:
+            
+            if tinggi_dinding > 1.8:
                 status = "✗ NON COMPLY - Tinggi dinding > 1,8 m"
             else:
                 status = "✓ COMPLY - AMAN" if vol_efektif_bund < kapasitas_tank_besar * 1.1 else "CHECK DATA"
