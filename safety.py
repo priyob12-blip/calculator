@@ -88,7 +88,7 @@ st.markdown("""
 # --- BAGIAN INPUT UTAMA ---
 col_shape, col_reset = st.columns([4, 1])
 with col_shape:
-    shape = st.selectbox("Select Bundwall Geometry:", ["Trapesium", "Persegi"], key="shape_select")
+    shape = st.selectbox("Pilih Jenis Bundwall:", ["Trapesium", "Persegi"], key="shape_select")
 with col_reset:
     if st.button("🔄 RESET SYSTEM", use_container_width=True):
         st.rerun()
