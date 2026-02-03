@@ -166,25 +166,22 @@ if shape == "Trapesium":
             else:
                 status = "✓ COMPLY - AMAN" if vol_efektif_bund > kapasitas_tank_besar * 1.1 else "✗ NON COMPLY"
             
-           # Perhitungan Safety Distance (Menggunakan Input Mandiri)
-            max_d_safety = max(d_safety_1, d_safety_2)
-            shell_to_shell = (1/6)*(d_safety_1 + d_safety_2) if max_d_safety <= 45 else (1/3)*(d_safety_1 + d_safety_2)
-            
+          max_d_s = max(d_safety_1, d_safety_2)
+            shell_to_shell = (1/6)*(d_safety_1 + d_safety_2) if max_d_s <= 45 else (1/3)*(d_safety_1 + d_safety_2)
             f_build = 1/6 if jenis_tank == "Floating Roof" else (1/6 if proteksi == "Proteksi" else 1/3)
-            tank_to_building = round(max(1.5, f_build * d_safety_1), 2)
-            
-            f_prop = 0.5 if (jenis_tank == "Floating Roof" and proteksi == "Proteksi") else \
-                     1 if jenis_tank == "Floating Roof" else (0.5 if proteksi == "Proteksi" else 2)
+            tank_to_build = round(max(1.5, f_build * d_safety_1), 2)
+            f_prop = 0.5 if (jenis_tank == "Floating Roof" and proteksi == "Proteksi") else 1 if jenis_tank == "Floating Roof" else (0.5 if proteksi == "Proteksi" else 2)
             tank_to_property = round(max(1.5, f_prop * d_safety_1), 2)
             
             st.markdown("### 📈 HASIL PERHITUNGAN")
-            col1, col2, col3 = st.columns(3)
-            with col1:
+            
+            col_res1, col_res2, col_res3 = st.columns(3)
+            with col_res1:
                 st.metric("Volume Bruto (m³)", f"{vol_bruto:.2f}")
                 st.metric("Vol. Pond+Tank (m³)", f"{vol_pond_tank:.2f}")
-            with col2:
+            with col_res2:
                 st.metric("Vol. Efektif Bund (m³)", f"{vol_efektif_bund:.2f}")
-                st.metric("Status", status)
+                st.metric("Status Safety", status)
             with col_res3:
                 st.metric("Shell to Shell (m)", f"{shell_to_shell:.2f}")
                 st.metric("Tank to Building (m)", f"{tank_to_build}")
