@@ -10,19 +10,19 @@ st.markdown("""
     /* Mengatur font agar lebih modern */
     @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Inter:wght@400;700&display=swap');
     
+    /* Banner Utama sesuai gambar yang diinginkan */
     .main-banner {
-        /* Gambar Background Tangki Timbun (Bukan Rumput/Gunung) */
-        background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), 
-        url('https://images.unsplash.com/photo-1581094271901-8022df4466f9?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80');
+        background-image: linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.65)), 
+        url('https://images.unsplash.com/photo-1516937941344-00b4e0337589?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80');
         background-size: cover;
         background-position: center;
-        padding: 5rem 3rem;
+        padding: 5rem 2rem;
         border-radius: 20px;
-        text-align: left;
+        text-align: center;
         color: white;
         margin-bottom: 2.5rem;
-        box-shadow: 0 15px 35px rgba(0,0,0,0.3);
-        border-bottom: 5px solid #00f2ff;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+        border: 1px solid rgba(255,255,255,0.1);
     }
 
     .main-banner h1 {
