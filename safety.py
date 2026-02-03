@@ -106,6 +106,12 @@ if shape == "Trapesium":
     lebar_luar = number_input_zero("Lebar Luar (m)", "l_luar")
     tinggi_dinding = number_input_zero("Tinggi Dinding (m)", "t_dinding")
     
+    # Judul Dimensi Dinding sesuai gaya banner
+    st.markdown("<div class='dimensi-header'><h3>🧱 Wall Dimension Details</h3></div>", unsafe_allow_html=True)
+    
+    col4, col5 = st.columns(2)
+    l_atas = col4.number_input("Lebar Atas (m)", min_value=0.0)
+    l_bawah = col5.number_input("Lebar Bawah (m)", min_value=0.0)
     col4, col5 = st.columns(2)
     lebar_atas = number_input_zero("Lebar Atas (m)", "lebar_atas")
     lebar_bawah = number_input_zero("Lebar Bawah (m)", "lebar_bawah")
