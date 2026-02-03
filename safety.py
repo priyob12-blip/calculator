@@ -1,8 +1,3 @@
-Mantap, Bro! Saya sudah buatkan kodingan khusus untuk bagian Banner Atas agar tampilannya persis seperti gambar yang kamu suka: menggunakan gambar tangki industri yang dramatis, teks yang menyala (neon/glow), dan overlay futuristik.
-
-Berikut adalah kodingan lengkapnya:
-Python
-
 import streamlit as st
 import math
 
