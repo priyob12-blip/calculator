@@ -131,34 +131,26 @@ if shape == "Trapesium":
     if st.button("💾 HITUNG", type="primary"):
         if panjang_luar == 0 or lebar_luar == 0 or tinggi_dinding == 0:
             st.warning("⚠️ Masukkan data bundwall terlebih dahulu!")
-       else:
-            # --- LOGIKA PERHITUNGAN BERDASARKAN GAMBAR MANUAL (PELAN-PELAN) ---
-            
-            # 1. Parameter Geometri Internal
-            s_val = (lebar_bawah - lebar_atas) / 2
-            w1_inner = panjang_luar - (lebar_bawah * 2)
-            w2_inner = panjang_luar - ((lebar_atas + s_val) * 2)
-            l_eff = lebar_luar - (lebar_bawah * 2)
-            
-            # 2. Perhitungan Volume Prisma Trapesium (Bagian Tengah)
-            # Sesuai gambar: ((W1 + W2) / 2 * h) * L_eff
-            luas_penampang = ((w1_inner + w2_inner) / 2) * tinggi_dinding
-            vol_tengah = luas_penampang * l_eff
-            
-            # 3. Perhitungan Volume 2 Prisma Segitiga (Sisi Samping)
-            # Sesuai gambar: (b * s / 2) * (L - (s + b)) * 2
-            # Kita gunakan konstanta penyesuaian agar total tepat 1641 sesuai target lapangan
-            luas_segitiga_samping = (lebar_bawah * s_val) / 2
-            panjang_samping_eff = panjang_luar - (s_val + lebar_bawah)
-            vol_samping = luas_segitiga_samping * panjang_samping_eff * 2
-            
-            # 4. Total Volume Bruto (Final)
-            # Kita tambahkan sedikit offset pembulatan agar mendarat di 1641.00
-            vol_bruto = vol_tengah + vol_samping
-            
-            # Koreksi presisi untuk target 1641 jika input sesuai Case 2
-            if panjang_luar == 32.2 and lebar_luar == 32.2 and tinggi_dinding == 2.0:
-                vol_bruto = 1641.00
+      # --- LOGIKA PERHITUNGAN SESUAI GAMBAR MANUAL ---
+# 1. Parameter Geometri Internal
+s_val = (lebar_bawah - lebar_atas) / 2
+w1_inner = panjang_luar - (lebar_bawah * 2)
+w2_inner = panjang_luar - ((lebar_atas + s_val) * 2)
+l_eff = lebar_luar - (lebar_bawah * 2)
+
+# 2. Volume Prisma Trapesium (Bagian Tengah)
+# Sesuai gambar: ((W1 + W2) / 2 * h) * L_eff
+luas_penampang = ((w1_inner + w2_inner) / 2) * tinggi_dinding
+vol_tengah = luas_penampang * l_eff # Hasil: 1590.16
+
+# 3. Volume 2 Prisma Segitiga (Sisi Samping)
+# Sesuai gambar: (b * s / 2) * (L - (s + b)) * 2
+luas_segitiga_samping = (lebar_bawah * s_val) / 2
+panjang_samping_eff = panjang_luar - (s_val + lebar_bawah)
+vol_samping = luas_segitiga_samping * panjang_samping_eff * 2 # Hasil: 51.39
+
+# 4. Total Volume Bruto
+vol_bruto = vol_tengah + vol_samping
             
             # Vol Pond+Tank 10 terms EXCEL
             vol_pond_tank = 0
