@@ -95,36 +95,20 @@ with col_reset:
 
 st.markdown("---")
 
-# Fungsi pembantu untuk input angka
 def number_input_zero(label, key):
-    return st.number_input(label, min_value=0.0, value=0.0, step=0.1, key=key)
+    return st.number_input(label, min_value=0.0, value=0.0, key=key)
 
-if shape == "Trapezoidal":
-    st.subheader("📐 Trapezoidal Geometry Input")
-    c1, c2, c3 = st.columns(3)
-    p_luar = c1.number_input("Outer Length (m)", min_value=0.0, key="pl_tr")
-    l_luar = c2.number_input("Outer Width (m)", min_value=0.0, key="ll_tr")
-    t_wall = c3.number_input("Wall Height (m)", min_value=0.0, key="tw_tr")
-
-    # HEADER DIMENSI DINDING
-    st.markdown("<div class='dimensi-header'><h3>🧱 Wall Dimension Details</h3></div>", unsafe_allow_html=True)
+if shape == "Trapesium":
+    st.header("📐 Bundwall Trapesium")
     
-    c4, c5 = st.columns(2)
-    l_atas = c4.number_input("Top Wall Width (m)", min_value=0.0, key="la_tr")
-    l_bawah = c5.number_input("Bottom Wall Width (m)", min_value=0.0, key="lb_tr")
-
-else:
-    st.subheader("📏 Rectangular Geometry Input")
-    c1, c2, c3 = st.columns(3)
-    p_rect = c1.number_input("Inner Length (m)", min_value=0.0, key="p_re")
-    l_rect = c2.number_input("Inner Width (m)", min_value=0.0, key="l_re")
-    t_rect = c3.number_input("Wall Height (m)", min_value=0.0, key="t_re")
-
-    st.markdown("<div class='dimensi-header'><h3>🧱 Wall Dimension Details</h3></div>", unsafe_allow_html=True)
+    col1, col2, col3 = st.columns(3)
+    panjang_luar = number_input_zero("Panjang Luar (m)", "p_luar")
+    lebar_luar = number_input_zero("Lebar Luar (m)", "l_luar")
+    tinggi_dinding = number_input_zero("Tinggi Dinding (m)", "t_dinding")
     
-    c4, c5 = st.columns(2)
-    t_side = c4.number_input("Wall Thickness - Side (m)", min_value=0.0, key="ts_re")
-    t_front = c5.number_input("Wall Thickness - Front (m)", min_value=0.0, key="tf_re")
+    col4, col5 = st.columns(2)
+    lebar_atas = number_input_zero("Lebar Atas (m)", "lebar_atas")
+    lebar_bawah = number_input_zero("Lebar Bawah (m)", "lebar_bawah")
     
     kapasitas_tank_besar = number_input_zero("Kapasitas Tangki Terbesar (KL)", "kapasitas")
     
@@ -266,6 +250,8 @@ else:  # Persegi
                 st.metric("Shell to Shell (m)", f"{shell_to_shell:.2f}")
                 st.metric("Tank to Building (m)", tank_to_building)
                 st.metric("Tank to Property (m)", tank_to_property)
+
+
 
 
 
