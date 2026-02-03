@@ -125,7 +125,13 @@ if shape == "Trapesium":
             d_pondasis[i] = number_input_zero(f"Diameter Pondasi {i+1} (m)", f"dpond_tr_{i}")
             t_pondasis[i] = number_input_zero(f"Tinggi Pondasi {i+1} (m)", f"tpond_tr_{i}")
             d_tanks[i] = number_input_zero(f"Diameter Tangki {i+1} (m)", f"dtank_tr_{i}")
-    
+            
+    # 2. TAMBAHAN INPUT SAFETY DISTANCE (SESUDAH TANGKI+PONDASI)
+    st.markdown("### 🛡️ Parameter Safety Distance (Mandiri)")
+    st.info("Gunakan diameter di bawah ini khusus untuk menentukan jarak aman antar tangki.")
+    col_sd1, col_sd2 = st.columns(2)
+    d_safety_1 = col_sd1.number_input("Diameter Tangki Pembanding 1 (m)", min_value=0.0, key="sd_d1")
+    d_safety_2 = col_sd2.number_input("Diameter Tangki Pembanding 2 (m)", min_value=0.0, key="sd_d2")
     col_prot, col_roof = st.columns(2)
     proteksi = col_prot.selectbox("Proteksi:", ["Proteksi", "Non Proteksi"], key="prot_tr")
     jenis_tank = col_roof.selectbox("Jenis Tangki:", ["Fixed Roof", "Floating Roof"], key="jenis_tr")
