@@ -3,39 +3,44 @@ import math
 
 st.set_page_config(page_title="Calculator Safety Tangki Timbun", layout="wide")
 
-# --- CUSTOM CSS UNTUK BANNER GAMBAR & STYLING ---
+# --- CUSTOM CSS UNTUK BANNER GAMBAR SESUAI FOTO ---
 st.markdown("""
 <style>
     .main-banner {
-        background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), 
-        url('https://images.unsplash.com/photo-1516937941344-00b4e0337589?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80');
+        /* Menggunakan URL gambar industri tangki yang mirip dengan visual sebelumnya */
+        background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), 
+        url('https://images.unsplash.com/photo-1542224566-6e85f2e6772f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80');
         background-size: cover;
         background-position: center;
-        padding: 3rem;
-        border-radius: 20px;
+        padding: 4rem 2rem;
+        border-radius: 15px;
         text-align: center;
         color: white;
-        margin-bottom: 2.5rem;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+        margin-bottom: 2rem;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.3);
     }
     .dimensi-header {
-        background-color: #f0f2f6;
-        padding: 10px;
-        border-left: 5px solid #2a5298;
-        border-radius: 5px;
-        margin-top: 1.5rem;
+        background-color: #e8f0fe;
+        padding: 15px;
+        border-left: 10px solid #1e3c72;
+        border-radius: 8px;
+        margin-top: 2rem;
         margin-bottom: 1rem;
+    }
+    .dimensi-header h3 {
+        margin: 0;
+        color: #1e3c72;
+        font-weight: bold;
     }
 </style>
 """, unsafe_allow_html=True)
 
-# Banner dengan Gambar Background
+# Banner Utama
 st.markdown("""
 <div class='main-banner'>
-    <h1 style='font-size: 3rem; margin: 0; text-shadow: 2px 2px 4px #000;'>📟 Calculator Safety Tangki Timbun</h1>
-    <p style='font-size: 1.3rem; margin: 10px 0; opacity: 0.9;'>Berdasarkan NFPA 30 "Flammable and Combustible Liquids Code"</p>
-    <div style='height: 2px; background: white; width: 100px; margin: 15px auto;'></div>
-    <p style='font-size: 1.1rem; font-style: italic;'>Engineered By. PBJ</p>
+    <h1 style='font-size: 3rem; margin: 0; font-weight: bold;'>📟 Calculator Safety Tangki Timbun</h1>
+    <p style='font-size: 1.3rem; margin: 0.5rem 0; opacity: 0.9;'>Berdasarkan NFPA 30 "Flammable and Combustible Liquids Code"</p>
+    <p style='font-size: 1.1rem; margin: 0; font-style: italic; opacity: 0.8;'>Engineered By. PBJ</p>
 </div>
 """, unsafe_allow_html=True)
 
