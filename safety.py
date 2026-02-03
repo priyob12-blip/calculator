@@ -73,7 +73,7 @@ st.markdown("""
 st.markdown("""
 <div class='main-banner'>
     <div style='display: flex; align-items: center; gap: 20px;'>
-        <div style='font-size: 4rem;'>📟</div>
+        <div style='font-size: 4rem;'></div>
         <div>
             <h1>BundSafe Tank Analytics</h1>
             <p>Bundwall & Storage Tank Safety Calculator</p>
