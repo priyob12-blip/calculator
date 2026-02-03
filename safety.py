@@ -1,72 +1,130 @@
 import streamlit as st
 import math
 
-st.set_page_config(page_title="Calculator Safety Tangki Timbun", layout="wide")
+# Konfigurasi Halaman agar tampil penuh (wide)
+st.set_page_config(page_title="BundSafe Tank Analytics", layout="wide")
 
-# --- CUSTOM CSS UNTUK BANNER GAMBAR & STYLING ---
+# --- CUSTOM CSS UNTUK BANNER TANGKI & UI MODERN ---
 st.markdown("""
 <style>
+    /* Mengatur font agar lebih modern */
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Inter:wght@400;700&display=swap');
+    
     .main-banner {
-        background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), 
-        url('https://images.unsplash.com/photo-1516937941344-00b4e0337589?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80');
+        /* Gambar Background Tangki Timbun (Bukan Rumput/Gunung) */
+        background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), 
+        url('https://images.unsplash.com/photo-1581094271901-8022df4466f9?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80');
         background-size: cover;
         background-position: center;
-        padding: 3rem;
+        padding: 5rem 3rem;
         border-radius: 20px;
-        text-align: center;
+        text-align: left;
         color: white;
         margin-bottom: 2.5rem;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+        box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+        border-bottom: 5px solid #00f2ff;
     }
-    .dimensi-header {
-        background-color: #f0f2f6;
-        padding: 10px;
-        border-left: 5px solid #2a5298;
+
+    .main-banner h1 {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 3.5rem;
+        margin: 0;
+        font-weight: 700;
+        color: #00f2ff; /* Cyan Neon */
+        text-shadow: 0 0 15px rgba(0, 242, 255, 0.6);
+    }
+
+    .main-banner p {
+        font-family: 'Inter', sans-serif;
+        font-size: 1.4rem;
+        margin: 10px 0;
+        font-weight: 400;
+    }
+
+    .tagline {
+        background: #ffcc00;
+        color: #000;
+        padding: 5px 15px;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-size: 0.85rem;
+        display: inline-block;
         border-radius: 5px;
-        margin-top: 1.5rem;
-        margin-bottom: 1rem;
+    }
+
+    /* Styling Judul Dimensi Dinding */
+    .dimensi-header {
+        background-color: #ffffff;
+        padding: 15px 25px;
+        border-radius: 12px;
+        margin: 2rem 0 1.5rem 0;
+        border-left: 10px solid #1e3c72;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+    
+    .dimensi-header h3 {
+        margin: 0;
+        color: #1e3c72;
+        font-weight: 700;
     }
 </style>
 """, unsafe_allow_html=True)
 
-# Banner dengan Gambar Background
+# --- IMPLEMENTASI BANNER ---
 st.markdown("""
 <div class='main-banner'>
-    <h1 style='font-size: 3rem; margin: 0; text-shadow: 2px 2px 4px #000;'>📟 Calculator Safety Tangki Timbun</h1>
-    <p style='font-size: 1.3rem; margin: 10px 0; opacity: 0.9;'>Berdasarkan NFPA 30 "Flammable and Combustible Liquids Code"</p>
-    <div style='height: 2px; background: white; width: 100px; margin: 15px auto;'></div>
-    <p style='font-size: 1.1rem; font-style: italic;'>Engineered By. PBJ</p>
+    <div style='display: flex; align-items: center; gap: 20px;'>
+        <div style='font-size: 4rem;'>🛡️</div>
+        <div>
+            <h1>BundSafe Tank Analytics</h1>
+            <p>Professional Spill Containment & Storage Tank Safety Calculator</p>
+            <div class='tagline'>Standardized by NFPA 30 | Engineered By. PBJ</div>
+        </div>
+    </div>
 </div>
 """, unsafe_allow_html=True)
 
+# --- BAGIAN INPUT UTAMA ---
+col_shape, col_reset = st.columns([4, 1])
+with col_shape:
+    shape = st.selectbox("Select Bundwall Geometry:", ["Trapezoidal", "Rectangular"], key="shape_select")
+with col_reset:
+    if st.button("🔄 RESET SYSTEM", use_container_width=True):
+        st.rerun()
+
 st.markdown("---")
 
-shape = st.selectbox("Pilih Bentuk Bundwall:", ["Trapesium", "Persegi"], key="shape_select")
-
-if st.button("🔄 RESET", type="secondary"):
-    st.rerun()
-
-st.markdown("---")
-
+# Fungsi pembantu untuk input angka
 def number_input_zero(label, key):
-    return st.number_input(label, min_value=0.0, value=0.0, key=key)
+    return st.number_input(label, min_value=0.0, value=0.0, step=0.1, key=key)
 
-if shape == "Trapesium":
-    st.header("📐 Bundwall Trapesium")
+if shape == "Trapezoidal":
+    st.subheader("📐 Trapezoidal Geometry Input")
+    c1, c2, c3 = st.columns(3)
+    p_luar = c1.number_input("Outer Length (m)", min_value=0.0, key="pl_tr")
+    l_luar = c2.number_input("Outer Width (m)", min_value=0.0, key="ll_tr")
+    t_wall = c3.number_input("Wall Height (m)", min_value=0.0, key="tw_tr")
+
+    # HEADER DIMENSI DINDING
+    st.markdown("<div class='dimensi-header'><h3>🧱 Wall Dimension Details</h3></div>", unsafe_allow_html=True)
     
-    col1, col2, col3 = st.columns(3)
-    panjang_luar = number_input_zero("Panjang Luar (m)", "p_luar")
-    lebar_luar = number_input_zero("Lebar Luar (m)", "l_luar")
-    tinggi_dinding = number_input_zero("Tinggi Dinding (m)", "t_dinding")
+    c4, c5 = st.columns(2)
+    l_atas = c4.number_input("Top Wall Width (m)", min_value=0.0, key="la_tr")
+    l_bawah = c5.number_input("Bottom Wall Width (m)", min_value=0.0, key="lb_tr")
+
+else:
+    st.subheader("📏 Rectangular Geometry Input")
+    c1, c2, c3 = st.columns(3)
+    p_rect = c1.number_input("Inner Length (m)", min_value=0.0, key="p_re")
+    l_rect = c2.number_input("Inner Width (m)", min_value=0.0, key="l_re")
+    t_rect = c3.number_input("Wall Height (m)", min_value=0.0, key="t_re")
+
+    st.markdown("<div class='dimensi-header'><h3>🧱 Wall Dimension Details</h3></div>", unsafe_allow_html=True)
     
-    # --- JUDUL BESAR DIMENSI DINDING ---
-    st.markdown("<div class='dimensi-header'><h3>🧱 Dimensi Dinding</h3></div>", unsafe_allow_html=True)
-    
-    col4, col5 = st.columns(2)
-    lebar_atas = number_input_zero("Lebar Atas (m)", "lebar_atas")
-    lebar_bawah = number_input_zero("Lebar Bawah (m)", "lebar_bawah")
-    
-    st.markdown("---")
+    c4, c5 = st.columns(2)
+    t_side = c4.number_input("Wall Thickness - Side (m)", min_value=0.0, key="ts_re")
+    t_front = c5.number_input("Wall Thickness - Front (m)", min_value=0.0, key="tf_re")
     
     kapasitas_tank_besar = number_input_zero("Kapasitas Tangki Terbesar (KL)", "kapasitas")
     
