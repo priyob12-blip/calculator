@@ -187,8 +187,9 @@ if shape == "Trapesium":
                 st.metric("Status", status)
             with col_res3:
                 st.metric("Shell to Shell (m)", f"{shell_to_shell:.2f}")
-                st.metric("Tank to Building (m)", f"{tank_to_building}")
+                st.metric("Tank to Building (m)", f"{tank_to_build}")
                 st.metric("Tank to Property (m)", f"{tank_to_property}")
+                
 else:  # Persegi
     st.header("📏 Bundwall Persegi")
     
