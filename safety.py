@@ -165,18 +165,17 @@ if shape == "Trapesium":
                 status = "✗ NON COMPLY - Tinggi dinding > 1,8 m"
             else:
                 status = "✓ COMPLY - AMAN" if vol_efektif_bund > kapasitas_tank_besar * 1.1 else "✗ NON COMPLY"
-
             
-            c15 = d_tanks[0]
-            c19 = d_tanks[1] if len(d_tanks)>1 else c15
-            shell_to_shell = (1/6)*(c15 + c19) if max(c15, c19) <= 45 else (1/3)*(c15 + c19)
+           # Perhitungan Safety Distance (Menggunakan Input Mandiri)
+            max_d_safety = max(d_safety_1, d_safety_2)
+            shell_to_shell = (1/6)*(d_safety_1 + d_safety_2) if max_d_safety <= 45 else (1/3)*(d_safety_1 + d_safety_2)
             
-            factor_build = 1/6 if jenis_tank == "Floating Roof" else (1/6 if proteksi == "Proteksi" else 1/3)
-            tank_to_building = round(max(1.5, factor_build * c15), 2)
+            f_build = 1/6 if jenis_tank == "Floating Roof" else (1/6 if proteksi == "Proteksi" else 1/3)
+            tank_to_building = round(max(1.5, f_build * d_safety_1), 2)
             
-            factor_prop = 0.5 if (jenis_tank == "Floating Roof" and proteksi == "Proteksi") else \
-                          1 if jenis_tank == "Floating Roof" else (0.5 if proteksi == "Proteksi" else 2)
-            tank_to_property = round(max(1.5, factor_prop * c15), 2)
+            f_prop = 0.5 if (jenis_tank == "Floating Roof" and proteksi == "Proteksi") else \
+                     1 if jenis_tank == "Floating Roof" else (0.5 if proteksi == "Proteksi" else 2)
+            tank_to_property = round(max(1.5, f_prop * d_safety_1), 2)
             
             st.markdown("### 📈 HASIL PERHITUNGAN")
             col1, col2, col3 = st.columns(3)
