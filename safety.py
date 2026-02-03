@@ -73,11 +73,11 @@ st.markdown("""
 st.markdown("""
 <div class='main-banner'>
     <div style='display: flex; align-items: center; gap: 20px;'>
-        <div style='font-size: 4rem;'>🛡️</div>
+        <div style='font-size: 4rem;'>📟</div>
         <div>
             <h1>BundSafe Tank Analytics</h1>
-            <p>Professional Spill Containment & Storage Tank Safety Calculator</p>
-            <div class='tagline'>Standardized by NFPA 30 | Engineered By. PBJ</div>
+            <p>Bundwall & Storage Tank Safety Calculator</p>
+            <div class='tagline'>Standardized by NFPA 30 | HSSE SULAWESI</div>
         </div>
     </div>
 </div>
