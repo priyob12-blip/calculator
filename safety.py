@@ -6,10 +6,11 @@ st.set_page_config(page_title="BundSafe Tank Analytics", layout="wide")
 # --- CUSTOM CSS UNTUK VISUAL PREMIUM ---
 st.markdown("""
 <style>
-    /* Banner Utama dengan nuansa Industri High-End */
+   <style>
+    /* Banner Utama sesuai gambar yang diinginkan */
     .main-banner {
-        background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
-        url('https://images.unsplash.com/photo-1542224566-6e85f2e6772f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80');
+        background-image: linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.65)), 
+        url('https://images.unsplash.com/photo-1516937941344-00b4e0337589?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80');
         background-size: cover;
         background-position: center;
         padding: 5rem 2rem;
@@ -17,9 +18,8 @@ st.markdown("""
         text-align: center;
         color: white;
         margin-bottom: 2.5rem;
-        box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.4);
         border: 1px solid rgba(255,255,255,0.1);
-    }
     
     /* Judul Dimensi Dinding Premium */
     .dimensi-header {
@@ -46,7 +46,7 @@ st.markdown("""
 st.markdown("""
 <div class='main-banner'>
     <h1 style='font-size: 3.8rem; margin: 0; font-weight: 900; letter-spacing: -1px;'>
-        🛡️ BundSafe Tank Analytics
+        📟 BundSafe Tank Analytics
     </h1>
     <p style='font-size: 1.4rem; margin: 15px 0; opacity: 0.85; font-weight: 400; color: #f0f2f6;'>
         Professional Spill Containment & Storage Tank Safety Calculator
