@@ -110,9 +110,6 @@ if shape == "Trapesium":
     st.markdown("### 🧱 Dimensi Dinding")
     
     col4, col5 = st.columns(2)
-    l_atas = col4.number_input("Lebar Atas (m)", min_value=0.0)
-    l_bawah = col5.number_input("Lebar Bawah (m)", min_value=0.0)
-    col4, col5 = st.columns(2)
     lebar_atas = number_input_zero("Lebar Atas (m)", "lebar_atas")
     lebar_bawah = number_input_zero("Lebar Bawah (m)", "lebar_bawah")
     
