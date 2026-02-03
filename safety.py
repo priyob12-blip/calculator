@@ -3,44 +3,55 @@ import math
 
 st.set_page_config(page_title="Calculator Safety Tangki Timbun", layout="wide")
 
-# --- CUSTOM CSS UNTUK BANNER GAMBAR SESUAI FOTO ---
+# --- CUSTOM CSS UNTUK VISUAL DASHBOARD ---
 st.markdown("""
 <style>
+    /* Banner Utama sesuai gambar yang diinginkan */
     .main-banner {
-        /* Menggunakan URL gambar industri tangki yang mirip dengan visual sebelumnya */
-        background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), 
-        url('https://images.unsplash.com/photo-1542224566-6e85f2e6772f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80');
+        background-image: linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.65)), 
+        url('https://images.unsplash.com/photo-1516937941344-00b4e0337589?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80');
         background-size: cover;
         background-position: center;
-        padding: 4rem 2rem;
-        border-radius: 15px;
+        padding: 5rem 2rem;
+        border-radius: 20px;
         text-align: center;
         color: white;
-        margin-bottom: 2rem;
-        box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        margin-bottom: 2.5rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+        border: 1px solid rgba(255,255,255,0.1);
     }
+    
+    /* Styling Judul Dimensi Dinding agar kontras */
     .dimensi-header {
-        background-color: #e8f0fe;
-        padding: 15px;
-        border-left: 10px solid #1e3c72;
-        border-radius: 8px;
-        margin-top: 2rem;
-        margin-bottom: 1rem;
+        background: linear-gradient(90deg, #1e3c72 0%, #2a5298 100%);
+        padding: 12px 20px;
+        border-radius: 10px;
+        margin: 2rem 0 1.5rem 0;
+        color: white;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
     }
+    
     .dimensi-header h3 {
         margin: 0;
-        color: #1e3c72;
-        font-weight: bold;
+        font-size: 1.5rem;
+        font-weight: 600;
+        letter-spacing: 1px;
     }
 </style>
 """, unsafe_allow_html=True)
 
-# Banner Utama
+# --- TAMPILAN BANNER ATAS ---
 st.markdown("""
 <div class='main-banner'>
-    <h1 style='font-size: 3rem; margin: 0; font-weight: bold;'>📟 Calculator Safety Tangki Timbun</h1>
-    <p style='font-size: 1.3rem; margin: 0.5rem 0; opacity: 0.9;'>Berdasarkan NFPA 30 "Flammable and Combustible Liquids Code"</p>
-    <p style='font-size: 1.1rem; margin: 0; font-style: italic; opacity: 0.8;'>Engineered By. PBJ</p>
+    <h1 style='font-size: 3.5rem; margin: 0; font-weight: 800; text-shadow: 3px 3px 6px rgba(0,0,0,0.5);'>
+        📟 Calculator Safety Tangki Timbun
+    </h1>
+    <p style='font-size: 1.4rem; margin: 15px 0; opacity: 0.9; font-weight: 300;'>
+        Berdasarkan NFPA 30 "Flammable and Combustible Liquids Code"
+    </p>
+    <p style='font-size: 1.1rem; margin: 0; font-style: italic; color: #ffcc00; font-weight: bold;'>
+        Engineered By. PBJ
+    </p>
 </div>
 """, unsafe_allow_html=True)
 
