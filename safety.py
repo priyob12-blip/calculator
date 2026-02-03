@@ -136,22 +136,23 @@ if shape == "Trapesium":
     if st.button("💾 HITUNG", type="primary"):
         if panjang_luar == 0 or lebar_luar == 0 or tinggi_dinding == 0:
             st.warning("⚠️ Masukkan data bundwall terlebih dahulu!")
-        else:
-        # --- RUMUS EXCEL PERSIS (C5=panjang_luar, C6=lebar_luar, C7=tinggi_dinding, C9=lebar_atas, C10=lebar_bawah) ---
-        
-        # Bagian 1: Volume Tengah (Main Body)
-        # ((( (C5-(2*C10)) + (C5-((C9+((C10-C9)/2))*2)) ) / 2 * C7) * (C6-(2*C10)))
-        v_tengah_part1 = (panjang_luar - (2 * lebar_bawah))
-        v_tengah_part2 = (panjang_luar - ((lebar_atas + ((lebar_bawah - lebar_atas) / 2)) * 2))
-        vol_tengah = ((v_tengah_part1 + v_tengah_part2) / 2 * tinggi_dinding) * (lebar_luar - (2 * lebar_bawah))
+       else:
+            # --- RUMUS EXCEL PERSIS ---
+            # C5:panjang_luar, C6:lebar_luar, C7:tinggi_dinding, C9:lebar_atas, C10:lebar_bawah
+            
+            # Bagian 1: Volume Tengah (Main Body)
+            # ((( (C5-(2*C10)) + (C5-((C9+((C10-C9)/2))*2)) ) / 2 * C7) * (C6-(2*C10)))
+            v_tengah_part1 = (panjang_luar - (2 * lebar_bawah))
+            v_tengah_part2 = (panjang_luar - ((lebar_atas + ((lebar_bawah - lebar_atas) / 2)) * 2))
+            vol_tengah = ((v_tengah_part1 + v_tengah_part2) / 2 * tinggi_dinding) * (lebar_luar - (2 * lebar_bawah))
 
-        # Bagian 2: Volume Sisi Samping (Side Wedges)
-        # (( (C10*((C10-C9)/2))/2 ) * (C5-(((C10-C9)/2)+C10)) * 2)
-        s_val = (lebar_bawah - lebar_atas) / 2
-        vol_samping = ((lebar_bawah * s_val) / 2) * (panjang_luar - (s_val + lebar_bawah)) * 2
+            # Bagian 2: Volume Sisi Samping (Side Wedges)
+            # (( (C10*((C10-C9)/2))/2 ) * (C5-(((C10-C9)/2)+C10)) * 2)
+            s_val = (lebar_bawah - lebar_atas) / 2
+            vol_samping = ((lebar_bawah * s_val) / 2) * (panjang_luar - (s_val + lebar_bawah)) * 2
 
-        # Total Volume Bruto
-        vol_bruto = vol_tengah + vol_samping
+            # Total Volume Bruto
+            vol_bruto = vol_tengah + vol_samping
             
             # Vol Pond+Tank 10 terms EXCEL
             vol_pond_tank = 0
