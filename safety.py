@@ -134,29 +134,23 @@ if shape == "Trapesium":
     jenis_tank = col_roof.selectbox("Jenis Tangki:", ["Fixed Roof", "Floating Roof"], key="jenis_tr")
     
     if st.button("💾 HITUNG", type="primary"):
-        if panjang_luar == 0 or lebar_luar == 0:
-            st.warning("⚠️ Masukkan data dimensi bundwall!")
+        if panjang_luar == 0 or lebar_luar == 0 or tinggi_dinding == 0:
+            st.warning("⚠️ Masukkan data bundwall terlebih dahulu!")
         else:
-            # --- RUMUS EXCEL PERSIS ---
-            # Bagian 1: Volume Tengah
-            v_t_1 = (panjang_luar - (2 * lebar_bawah))
-            v_t_2 = (panjang_luar - ((lebar_atas + ((lebar_bawah - lebar_atas) / 2)) * 2))
-            vol_tengah = ((v_t_1 + v_t_2) / 2 * tinggi_dinding) * (lebar_luar - (2 * lebar_bawah))
-
-            # Bagian 2: Volume Samping
-            s_val = (lebar_bawah - lebar_atas) / 2
-            vol_samping = ((lebar_bawah * s_val) / 2) * (panjang_luar - (s_val + lebar_bawah)) * 2
-
-            vol_bruto = vol_tengah + vol_samping
-
-            # Volume Pondasi & Tangki Submerged
+            # Vol Bruto EXCEL PERSIS
+            term1_inner = (panjang_luar-(lebar_bawah*2)) + (panjang_luar-((lebar_atas+((lebar_bawah-lebar_atas)/2))*2))
+            term1 = ((term1_inner/2)*tinggi_dinding)*(lebar_luar-(tinggi_dinding*2))
+            term2_inner = (tinggi_dinding*((lebar_bawah-lebar_atas)/2))/2
+            term2 = (term2_inner*(panjang_luar-((lebar_atas+((lebar_bawah-lebar_atas)/4))*2)))*2
+            vol_bruto = term1 + term2
+            
+            # Vol Pond+Tank 10 terms EXCEL
             vol_pond_tank = 0
             for i in range(5):
-                v_p = math.pi * ((d_pondasis[i]/2)**2) * t_pondasis[i]
-                v_t = math.pi * ((d_tanks[i]/2)**2) * max(0.0, tinggi_dinding - t_pondasis[i])
-                vol_pond_tank += (v_p + v_t)
-
-            vol_efektif = vol_bruto - vol_pond_tank
+                vol_pond_tank += (math.pi * ((d_pondasis[i]/2)**2) * t_pondasis[i]) + \
+                                 (math.pi * ((d_tanks[i]/2)**2) * max(0, tinggi_dinding - t_pondasis[i]))
+            
+            vol_efektif_bund = vol_bruto - vol_pond_tank
 
             if vol_pond_tank > vol_efektif_bund:
                 status = "✗ NON COMPLY - Volume bund kurang"
@@ -265,8 +259,3 @@ else:  # Persegi
                 st.metric("Shell to Shell (m)", f"{shell_to_shell:.2f}")
                 st.metric("Tank to Building (m)", tank_to_building)
                 st.metric("Tank to Property (m)", tank_to_property)
-
-
-
-
-
