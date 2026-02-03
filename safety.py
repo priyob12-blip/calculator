@@ -78,7 +78,7 @@ st.markdown("""
         <div style='font-size: 4rem;'></div>
         <div>
             <h1>BundSafe Tank Analytics</h1>
-            <p>Professional Spill Containment & Storage Tank Safety Calculator</p>
+            <p>Bundwall & Storage Tank Safety Calculator</p>
             <div class='tagline'>Standardized by NFPA 30 | HSSE SULAWESI </div>
         </div>
     </div>
