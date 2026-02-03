@@ -1,70 +1,77 @@
+Oke Bro, ini kodingan Python (.py) lengkapnya. Saya sudah ganti background bannernya dengan gambar tangki timbun (tank farm) dari sudut pandang udara (aerial view) agar terlihat sangat profesional dan sesuai dengan bidang industrinya.
+
+Silakan salin kode di bawah ini:
+Python
+
 import streamlit as st
 import math
 
+# Konfigurasi Halaman agar tampil penuh (wide)
 st.set_page_config(page_title="BundSafe Tank Analytics", layout="wide")
 
-# --- CUSTOM CSS UNTUK BANNER FUTURISTIK ---
+# --- CUSTOM CSS UNTUK BANNER TANGKI & UI MODERN ---
 st.markdown("""
 <style>
-    /* Mengatur font global agar lebih modern */
-    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;700&display=swap');
+    /* Mengatur font agar lebih modern */
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Inter:wght@400;700&display=swap');
     
     .main-banner {
-        /* Gambar Background Tangki Industri */
-        background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.7)), 
-        url('https://images.unsplash.com/photo-1542224566-6e85f2e6772f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80');
+        /* Gambar Background Tangki Timbun (Bukan Rumput/Gunung) */
+        background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), 
+        url('https://images.unsplash.com/photo-1581094271901-8022df4466f9?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80');
         background-size: cover;
         background-position: center;
         padding: 5rem 3rem;
         border-radius: 20px;
-        text-align: left; /* Teks rata kiri agar terlihat seperti dashboard profesional */
+        text-align: left;
         color: white;
         margin-bottom: 2.5rem;
-        box-shadow: 0 15px 35px rgba(0,0,0,0.5);
-        border: 1px solid rgba(0, 255, 255, 0.3); /* Border tipis warna cyan */
-        position: relative;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+        border-bottom: 5px solid #00f2ff;
     }
 
-    /* Efek Glow/Neon pada Judul */
     .main-banner h1 {
         font-family: 'Orbitron', sans-serif;
-        font-size: 4rem;
+        font-size: 3.5rem;
         margin: 0;
         font-weight: 700;
-        color: #00f2ff; /* Warna Cyan Neon */
-        text-shadow: 0 0 10px rgba(0, 242, 255, 0.7), 0 0 20px rgba(0, 242, 255, 0.5);
+        color: #00f2ff; /* Cyan Neon */
+        text-shadow: 0 0 15px rgba(0, 242, 255, 0.6);
     }
 
     .main-banner p {
         font-family: 'Inter', sans-serif;
-        font-size: 1.5rem;
+        font-size: 1.4rem;
         margin: 10px 0;
-        opacity: 0.9;
-        font-weight: 300;
+        font-weight: 400;
     }
 
-    .main-banner .tagline {
-        color: #ffcc00; /* Warna Kuning untuk info Engineered By */
+    .tagline {
+        background: #ffcc00;
+        color: #000;
+        padding: 5px 15px;
         font-weight: bold;
-        font-size: 1.1rem;
-        letter-spacing: 2px;
         text-transform: uppercase;
+        letter-spacing: 1px;
+        font-size: 0.85rem;
+        display: inline-block;
+        border-radius: 5px;
     }
 
     /* Styling Judul Dimensi Dinding */
     .dimensi-header {
-        background: rgba(30, 60, 114, 0.1);
-        padding: 15px 20px;
-        border-radius: 10px;
-        border-left: 6px solid #00f2ff;
+        background-color: #ffffff;
+        padding: 15px 25px;
+        border-radius: 12px;
         margin: 2rem 0 1.5rem 0;
+        border-left: 10px solid #1e3c72;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     }
     
     .dimensi-header h3 {
         margin: 0;
-        color: #00f2ff;
-        font-family: 'Orbitron', sans-serif;
-        font-size: 1.4rem;
+        color: #1e3c72;
+        font-weight: 700;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -77,7 +84,6 @@ st.markdown("""
         <div>
             <h1>BundSafe Tank Analytics</h1>
             <p>Professional Spill Containment & Storage Tank Safety Calculator</p>
-            <div style='height: 2px; background: rgba(0, 242, 255, 0.5); width: 150px; margin: 15px 0;'></div>
             <div class='tagline'>Standardized by NFPA 30 | Engineered By. PBJ</div>
         </div>
     </div>
