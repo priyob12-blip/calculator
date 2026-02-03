@@ -167,16 +167,38 @@ if shape == "Trapesium":
             else:
                 status = "✓ COMPLY - AMAN" if vol_efektif_bund > kapasitas_tank_besar * 1.1 else "✗ NON COMPLY"
             
-         # B. Kalkulasi Safety Distance (Input Baru)
+        # --- B. Kalkulasi Safety Distance (Revisi Sesuai Logika Excel & Input d_safety) ---
+            
+            # max_d_s untuk menentukan pembagi shell to shell
             max_d_s = max(d_safety_1, d_safety_2)
+            
+            # 1. Shell to Shell (1/6 jika <= 45m, 1/3 jika > 45m)
             shell_to_shell = (1/6)*(d_safety_1 + d_safety_2) if max_d_s <= 45 else (1/3)*(d_safety_1 + d_safety_2)
             
-            f_build = 1/6 if jenis_tank == "Floating Roof" else (1/6 if proteksi == "Proteksi" else 1/3)
-            tank_to_build = max(1.5, f_build * d_safety_1)
+            # 2. Tank to Building (Sesuai Rumus: ROUND(MAX(1.5; IF...)))
+            if jenis_tank == "Floating Roof":
+                f_build = 1/6
+            elif proteksi == "Proteksi":
+                f_build = 1/6
+            else:
+                f_build = 1/3
             
-            f_prop = 0.5 if (jenis_tank == "Floating Roof" and proteksi == "Proteksi") else 1.0 if jenis_tank == "Floating Roof" else (0.5 if proteksi == "Proteksi" else 2.0)
-            tank_to_property = max(1.5, f_prop * d_safety_1)
+            # Menggunakan d_safety_1 sebagai C15 (Diameter Tangki Utama)
+            tank_to_build = round(max(1.5, f_build * d_safety_1), 2)
             
+            # 3. Tank to Property (Sesuai Rumus: ROUND(MAX(1.5; IF...)))
+            if jenis_tank == "Floating Roof":
+                if proteksi == "Proteksi":
+                    f_prop = 1/2
+                else:
+                    f_prop = 1
+            else:
+                if proteksi == "Proteksi":
+                    f_prop = 1/2
+                else:
+                    f_prop = 2
+                    
+            tank_to_property = round(max(1.5, f_prop * d_safety_1), 2)
             st.markdown("### 📈 HASIL PERHITUNGAN")
             
             col_res1, col_res2, col_res3 = st.columns(3)
