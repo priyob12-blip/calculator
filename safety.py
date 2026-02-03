@@ -1,15 +1,15 @@
 import streamlit as st
 import math
 
-st.set_page_config(page_title="Calculator Safety Tangki Timbun", layout="wide")
+st.set_page_config(page_title="BundSafe Tank Analytics", layout="wide")
 
-# --- CUSTOM CSS UNTUK VISUAL DASHBOARD ---
+# --- CUSTOM CSS UNTUK VISUAL PREMIUM ---
 st.markdown("""
 <style>
-    /* Banner Utama sesuai gambar yang diinginkan */
+    /* Banner Utama dengan nuansa Industri High-End */
     .main-banner {
-        background-image: linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.65)), 
-        url('https://images.unsplash.com/photo-1516937941344-00b4e0337589?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80');
+        background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
+        url('https://images.unsplash.com/photo-1542224566-6e85f2e6772f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80');
         background-size: cover;
         background-position: center;
         padding: 5rem 2rem;
@@ -17,25 +17,27 @@ st.markdown("""
         text-align: center;
         color: white;
         margin-bottom: 2.5rem;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+        box-shadow: 0 12px 40px rgba(0,0,0,0.5);
         border: 1px solid rgba(255,255,255,0.1);
     }
     
-    /* Styling Judul Dimensi Dinding agar kontras */
+    /* Judul Dimensi Dinding Premium */
     .dimensi-header {
-        background: linear-gradient(90deg, #1e3c72 0%, #2a5298 100%);
-        padding: 12px 20px;
-        border-radius: 10px;
-        margin: 2rem 0 1.5rem 0;
+        background: linear-gradient(90deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+        padding: 15px 25px;
+        border-radius: 12px;
+        margin: 2.5rem 0 1.5rem 0;
         color: white;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        border-left: 8px solid #ffcc00; /* Aksen Kuning */
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
     }
     
     .dimensi-header h3 {
         margin: 0;
-        font-size: 1.5rem;
-        font-weight: 600;
-        letter-spacing: 1px;
+        font-size: 1.6rem;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -43,20 +45,20 @@ st.markdown("""
 # --- TAMPILAN BANNER ATAS ---
 st.markdown("""
 <div class='main-banner'>
-    <h1 style='font-size: 3.5rem; margin: 0; font-weight: 800; text-shadow: 3px 3px 6px rgba(0,0,0,0.5);'>
-        📟 Calculator Safety Tangki Timbun
+    <h1 style='font-size: 3.8rem; margin: 0; font-weight: 900; letter-spacing: -1px;'>
+        🛡️ BundSafe Tank Analytics
     </h1>
-    <p style='font-size: 1.4rem; margin: 15px 0; opacity: 0.9; font-weight: 300;'>
-        Berdasarkan NFPA 30 "Flammable and Combustible Liquids Code"
+    <p style='font-size: 1.4rem; margin: 15px 0; opacity: 0.85; font-weight: 400; color: #f0f2f6;'>
+        Professional Spill Containment & Storage Tank Safety Calculator
     </p>
-    <p style='font-size: 1.1rem; margin: 0; font-style: italic; color: #ffcc00; font-weight: bold;'>
-        HSSE SULAWESI
+    <div style='height: 3px; background: #ffcc00; width: 80px; margin: 20px auto;'></div>
+    <p style='font-size: 1.2rem; margin: 0; font-style: italic; color: #ffffff;'>
+        Standardized by NFPA 30 | HSSE SULAWESI
     </p>
 </div>
 """, unsafe_allow_html=True)
 
 st.markdown("---")
-
 shape = st.selectbox("Pilih Bentuk Bundwall:", ["Trapesium", "Persegi"], key="shape_select")
 
 if st.button("🔄 RESET", type="secondary"):
