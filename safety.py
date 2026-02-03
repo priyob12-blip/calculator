@@ -138,8 +138,7 @@ if shape == "Trapesium":
             term2_inner = (tinggi_dinding*((lebar_bawah-lebar_atas)/2))/2
             term2 = (term2_inner*(panjang_luar-((lebar_atas+((lebar_bawah-lebar_atas)/4))*2)))*2
             vol_bruto = term1 + term2
-
-            
+         
             # Vol Pond+Tank 10 terms EXCEL
             vol_pond_tank = 0
             for i in range(5):
