@@ -32,6 +32,9 @@ if shape == "Trapesium":
     lebar_luar = number_input_zero("Lebar Luar (m)", "l_luar")
     tinggi_dinding = number_input_zero("Tinggi Dinding (m)", "t_dinding")
     
+    # --- TAMBAHAN JUDUL DIMENSI ---
+    st.markdown("### 🧱 Dimensi Dinding")
+    
     col4, col5 = st.columns(2)
     lebar_atas = number_input_zero("Lebar Atas (m)", "lebar_atas")
     lebar_bawah = number_input_zero("Lebar Bawah (m)", "lebar_bawah")
