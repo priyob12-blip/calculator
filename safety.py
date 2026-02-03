@@ -1,8 +1,3 @@
-Oke Bro, ini kodingan Python (.py) lengkapnya. Saya sudah ganti background bannernya dengan gambar tangki timbun (tank farm) dari sudut pandang udara (aerial view) agar terlihat sangat profesional dan sesuai dengan bidang industrinya.
-
-Silakan salin kode di bawah ini:
-Python
-
 import streamlit as st
 import math
 
