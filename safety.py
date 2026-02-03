@@ -190,8 +190,7 @@ if shape == "Trapesium":
                 st.metric("Shell to Shell (m)", f"{shell_to_shell:.2f}")
                 st.metric("Tank to Building (m)", f"{tank_to_build:.2f}")
                 st.metric("Tank to Property (m)", f"{tank_to_property:.2f}")
-        else:
-            st.error("Input Utama belum lengkap!")
+       
 else:  # Persegi
     st.header("📏 Bundwall Persegi")
     
