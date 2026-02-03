@@ -126,8 +126,9 @@ if shape == "Trapesium":
             t_pondasis[i] = number_input_zero(f"Tinggi Pondasi {i+1} (m)", f"tpond_tr_{i}")
             d_tanks[i] = number_input_zero(f"Diameter Tangki {i+1} (m)", f"dtank_tr_{i}")
             
-    # 2. TAMBAHAN INPUT SAFETY DISTANCE (SESUDAH TANGKI+PONDASI)
-    st.markdown("### 🛡️ Safety Distance ")
+   # --- 3. INPUT SAFETY DISTANCE (SESUDAH TANGKI+PONDASI) ---
+    st.markdown("---")
+    st.markdown("### 🛡️ Safety Distance")
     st.info("Gunakan diameter di bawah ini khusus untuk menentukan jarak aman antar tangki.")
     col_sd1, col_sd2 = st.columns(2)
     d_safety_1 = col_sd1.number_input("Diameter Tangki Pembanding 1 (m)", min_value=0.0, key="sd_d1")
@@ -166,12 +167,15 @@ if shape == "Trapesium":
             else:
                 status = "✓ COMPLY - AMAN" if vol_efektif_bund > kapasitas_tank_besar * 1.1 else "✗ NON COMPLY"
             
-         # Kalkulasi Safety Distance (Berdasarkan Input Baru)
+         # B. Kalkulasi Safety Distance (Input Baru)
             max_d_s = max(d_safety_1, d_safety_2)
             shell_to_shell = (1/6)*(d_safety_1 + d_safety_2) if max_d_s <= 45 else (1/3)*(d_safety_1 + d_safety_2)
             
             f_build = 1/6 if jenis_tank == "Floating Roof" else (1/6 if proteksi == "Proteksi" else 1/3)
             tank_to_build = max(1.5, f_build * d_safety_1)
+            
+            f_prop = 0.5 if (jenis_tank == "Floating Roof" and proteksi == "Proteksi") else 1.0 if jenis_tank == "Floating Roof" else (0.5 if proteksi == "Proteksi" else 2.0)
+            tank_to_property = max(1.5, f_prop * d_safety_1)
             
             st.markdown("### 📈 HASIL PERHITUNGAN")
             
@@ -182,13 +186,12 @@ if shape == "Trapesium":
             with col_res2:
                 st.metric("Vol. Efektif Bund (m³)", f"{vol_efektif_bund:.2f}")
                 st.metric("Status Safety", status)
-         with col3:
-            # Menggunakan variabel yang baru dihitung di atas
-            st.metric("Shell to Shell (m)", f"{shell_to_shell:.2f}")
-            st.metric("Tank to Building (m)", f"{tank_to_building:.2f}")
-            st.metric("Tank to Property (m)", f"{tank_to_property:.2f}")
-    else:
-        st.error("Masukkan Diameter Tangki Pembanding untuk menghitung Safety Distance!")
+        with col_res3:
+                st.metric("Shell to Shell (m)", f"{shell_to_shell:.2f}")
+                st.metric("Tank to Building (m)", f"{tank_to_build:.2f}")
+                st.metric("Tank to Property (m)", f"{tank_to_property:.2f}")
+        else:
+            st.error("Input Utama belum lengkap!")
 else:  # Persegi
     st.header("📏 Bundwall Persegi")
     
