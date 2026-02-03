@@ -50,7 +50,7 @@ st.markdown("""
         Berdasarkan NFPA 30 "Flammable and Combustible Liquids Code"
     </p>
     <p style='font-size: 1.1rem; margin: 0; font-style: italic; color: #ffcc00; font-weight: bold;'>
-        Engineered By. PBJ
+        HSSE SULAWESI
     </p>
 </div>
 """, unsafe_allow_html=True)
