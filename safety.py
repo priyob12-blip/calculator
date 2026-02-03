@@ -185,11 +185,10 @@ if shape == "Trapesium":
             with col2:
                 st.metric("Vol. Efektif Bund (m³)", f"{vol_efektif_bund:.2f}")
                 st.metric("Status", status)
-            with col3:
+            with col_res3:
                 st.metric("Shell to Shell (m)", f"{shell_to_shell:.2f}")
-                st.metric("Tank to Building (m)", tank_to_building)
-                st.metric("Tank to Property (m)", tank_to_property)
-
+                st.metric("Tank to Building (m)", f"{tank_to_building}")
+                st.metric("Tank to Property (m)", f"{tank_to_property}")
 else:  # Persegi
     st.header("📏 Bundwall Persegi")
     
