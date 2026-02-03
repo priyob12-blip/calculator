@@ -6,38 +6,130 @@ st.set_page_config(page_title="BundSafe Tank Analytics", layout="wide")
 # --- CUSTOM CSS UNTUK VISUAL PREMIUM ---
 st.markdown("""
 <style>
-   <style>
-    /* Banner Utama sesuai gambar yang diinginkan */
+    /* Styling untuk seluruh halaman, agar latar belakang cocok dengan banner */
+    body {
+        background-color: #0f1116; /* Warna latar belakang gelap */
+        color: #e0e0e0;
+    }
+    .stApp {
+        background-color: #0f1116; /* Menyamakan warna latar belakang Streamlit */
+    }
+
+    /* Banner Utama dengan gambar background yang dramatis */
     .main-banner {
-        background-image: linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.65)), 
-        url('https://images.unsplash.com/photo-1516937941344-00b4e0337589?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80');
+        background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)), 
+                        url('https://images.unsplash.com/photo-1579547621810-5491104e793e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80'); /* Gambar tangki dengan sunset */
         background-size: cover;
         background-position: center;
-        padding: 5rem 2rem;
+        padding: 6rem 2rem; /* Padding lebih besar */
         border-radius: 20px;
         text-align: center;
         color: white;
-        margin-bottom: 2.5rem;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+        margin-bottom: 3rem; /* Margin lebih besar */
+        box-shadow: 0 15px 50px rgba(0,0,0,0.6); /* Shadow lebih kuat */
         border: 1px solid rgba(255,255,255,0.1);
-    
-    /* Judul Dimensi Dinding Premium */
-    .dimensi-header {
-        background: linear-gradient(90deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
-        padding: 15px 25px;
-        border-radius: 12px;
-        margin: 2.5rem 0 1.5rem 0;
-        color: white;
-        border-left: 8px solid #ffcc00; /* Aksen Kuning */
-        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        position: relative;
+        overflow: hidden; /* Pastikan tidak ada overflow dari pseudo-element */
     }
-    
+
+    /* Efek overlay futuristik (pseudo-element) */
+    .main-banner::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: radial-gradient(circle at 70% 30%, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0) 70%);
+        pointer-events: none;
+    }
+
+    .main-banner h1 {
+        font-size: 4rem; /* Ukuran font lebih besar */
+        margin: 0;
+        font-weight: 900;
+        letter-spacing: -2px;
+        text-shadow: 4px 4px 8px rgba(0,0,0,0.6);
+        background: linear-gradient(45deg, #a4eaff, #80c8ff); /* Gradient untuk judul utama */
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        display: inline-block; /* Penting untuk gradient teks */
+    }
+    .main-banner p {
+        font-size: 1.5rem; /* Ukuran font lebih besar */
+        margin: 18px 0;
+        opacity: 0.9;
+        font-weight: 300;
+        color: #f0f2f6;
+        text-shadow: 1px 1px 3px rgba(0,0,0,0.4);
+    }
+    .main-banner .tagline {
+        font-size: 1.2rem;
+        margin: 0;
+        font-style: italic;
+        color: #ffcc00; /* Kuning terang */
+        font-weight: bold;
+        text-shadow: 1px 1px 3px rgba(0,0,0,0.4);
+    }
+    .main-banner .separator {
+        height: 4px;
+        background: linear-gradient(90deg, transparent, #ffcc00, transparent);
+        width: 120px;
+        margin: 25px auto;
+        border-radius: 2px;
+    }
+
+    /* Judul Dimensi Dinding dengan gaya futuristik */
+    .dimensi-header {
+        background: linear-gradient(90deg, #1f2a3a 0%, #2a3e54 50%, #3a5871 100%);
+        padding: 18px 30px;
+        border-radius: 15px;
+        margin: 3rem 0 2rem 0; /* Margin lebih besar */
+        color: white;
+        border-left: 8px solid #00aaff; /* Aksen biru terang */
+        box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
     .dimensi-header h3 {
         margin: 0;
-        font-size: 1.6rem;
+        font-size: 1.7rem; /* Ukuran font lebih besar */
         font-weight: 700;
-        letter-spacing: 1.5px;
+        letter-spacing: 1.8px;
         text-transform: uppercase;
+        color: #e0f2f7;
+    }
+    .dimensi-header .icon {
+        font-size: 2rem;
+        color: #00aaff;
+    }
+
+    /* Styling umum untuk input dan tombol */
+    .stSelectbox > div > div {
+        background-color: #1a1f26;
+        color: #e0e0e0;
+        border: 1px solid #333;
+        border-radius: 8px;
+    }
+    .stNumberInput > div > div > input {
+        background-color: #1a1f26;
+        color: #e0e0e0;
+        border: 1px solid #333;
+        border-radius: 8px;
+    }
+    .stButton > button {
+        background-color: #00aaff;
+        color: white;
+        font-weight: bold;
+        border-radius: 10px;
+        padding: 10px 20px;
+        border: none;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+    .stButton > button:hover {
+        background-color: #007bff;
+        transform: translateY(-2px);
     }
 </style>
 """, unsafe_allow_html=True)
@@ -45,18 +137,14 @@ st.markdown("""
 # --- TAMPILAN BANNER ATAS ---
 st.markdown("""
 <div class='main-banner'>
-    <h1 style='font-size: 3.8rem; margin: 0; font-weight: 900; letter-spacing: -1px;'>
-        📟 BundSafe Tank Analytics
-    </h1>
-    <p style='font-size: 1.4rem; margin: 15px 0; opacity: 0.85; font-weight: 400; color: #f0f2f6;'>
-        Professional Spill Containment & Storage Tank Safety Calculator
-    </p>
-    <div style='height: 3px; background: #ffcc00; width: 80px; margin: 20px auto;'></div>
-    <p style='font-size: 1.2rem; margin: 0; font-style: italic; color: #ffffff;'>
-        Standardized by NFPA 30 | HSSE SULAWESI
-    </p>
+    <h1>🛡️ BundSafe Tank Analytics</h1>
+    <p>Professional Spill Containment & Storage Tank Safety Calculator</p>
+    <div class='separator'></div>
+    <p class='tagline'>Standardized by NFPA 30 | Engineered By. PBJ</p>
 </div>
 """, unsafe_allow_html=True)
+
+st.markdown("---")
 
 st.markdown("---")
 shape = st.selectbox("Pilih Bentuk Bundwall:", ["Trapesium", "Persegi"], key="shape_select")
