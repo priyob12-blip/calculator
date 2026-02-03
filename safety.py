@@ -182,11 +182,13 @@ if shape == "Trapesium":
             with col_res2:
                 st.metric("Vol. Efektif Bund (m³)", f"{vol_efektif_bund:.2f}")
                 st.metric("Status Safety", status)
-           with col3:
-                # Menambahkan f-string agar format angka konsisten 2 desimal
-                st.metric("Shell to Shell (m)", f"{shell_to_shell:.2f}")
-                st.metric("Tank to Building (m)", f"{tank_to_building:.2f}")
-                st.metric("Tank to Property (m)", f"{tank_to_property:.2f}")
+         with col3:
+            # Menggunakan variabel yang baru dihitung di atas
+            st.metric("Shell to Shell (m)", f"{shell_to_shell:.2f}")
+            st.metric("Tank to Building (m)", f"{tank_to_building:.2f}")
+            st.metric("Tank to Property (m)", f"{tank_to_property:.2f}")
+    else:
+        st.error("Masukkan Diameter Tangki Pembanding untuk menghitung Safety Distance!")
 else:  # Persegi
     st.header("📏 Bundwall Persegi")
     
