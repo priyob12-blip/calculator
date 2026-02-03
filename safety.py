@@ -1,150 +1,95 @@
+Mantap, Bro! Saya sudah buatkan kodingan khusus untuk bagian Banner Atas agar tampilannya persis seperti gambar yang kamu suka: menggunakan gambar tangki industri yang dramatis, teks yang menyala (neon/glow), dan overlay futuristik.
+
+Berikut adalah kodingan lengkapnya:
+Python
+
 import streamlit as st
 import math
 
 st.set_page_config(page_title="BundSafe Tank Analytics", layout="wide")
 
-# --- CUSTOM CSS UNTUK VISUAL PREMIUM ---
+# --- CUSTOM CSS UNTUK BANNER FUTURISTIK ---
 st.markdown("""
 <style>
-    /* Styling untuk seluruh halaman, agar latar belakang cocok dengan banner */
-    body {
-        background-color: #0f1116; /* Warna latar belakang gelap */
-        color: #e0e0e0;
-    }
-    .stApp {
-        background-color: #0f1116; /* Menyamakan warna latar belakang Streamlit */
-    }
-
-    /* Banner Utama dengan gambar background yang dramatis */
+    /* Mengatur font global agar lebih modern */
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;700&display=swap');
+    
     .main-banner {
-        background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)), 
-                        url('https://images.unsplash.com/photo-1579547621810-5491104e793e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80'); /* Gambar tangki dengan sunset */
+        /* Gambar Background Tangki Industri */
+        background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.7)), 
+        url('https://images.unsplash.com/photo-1542224566-6e85f2e6772f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80');
         background-size: cover;
         background-position: center;
-        padding: 6rem 2rem; /* Padding lebih besar */
+        padding: 5rem 3rem;
         border-radius: 20px;
-        text-align: center;
+        text-align: left; /* Teks rata kiri agar terlihat seperti dashboard profesional */
         color: white;
-        margin-bottom: 3rem; /* Margin lebih besar */
-        box-shadow: 0 15px 50px rgba(0,0,0,0.6); /* Shadow lebih kuat */
-        border: 1px solid rgba(255,255,255,0.1);
+        margin-bottom: 2.5rem;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+        border: 1px solid rgba(0, 255, 255, 0.3); /* Border tipis warna cyan */
         position: relative;
-        overflow: hidden; /* Pastikan tidak ada overflow dari pseudo-element */
     }
 
-    /* Efek overlay futuristik (pseudo-element) */
-    .main-banner::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: radial-gradient(circle at 70% 30%, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0) 70%);
-        pointer-events: none;
-    }
-
+    /* Efek Glow/Neon pada Judul */
     .main-banner h1 {
-        font-size: 4rem; /* Ukuran font lebih besar */
+        font-family: 'Orbitron', sans-serif;
+        font-size: 4rem;
         margin: 0;
-        font-weight: 900;
-        letter-spacing: -2px;
-        text-shadow: 4px 4px 8px rgba(0,0,0,0.6);
-        background: linear-gradient(45deg, #a4eaff, #80c8ff); /* Gradient untuk judul utama */
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        display: inline-block; /* Penting untuk gradient teks */
+        font-weight: 700;
+        color: #00f2ff; /* Warna Cyan Neon */
+        text-shadow: 0 0 10px rgba(0, 242, 255, 0.7), 0 0 20px rgba(0, 242, 255, 0.5);
     }
+
     .main-banner p {
-        font-size: 1.5rem; /* Ukuran font lebih besar */
-        margin: 18px 0;
+        font-family: 'Inter', sans-serif;
+        font-size: 1.5rem;
+        margin: 10px 0;
         opacity: 0.9;
         font-weight: 300;
-        color: #f0f2f6;
-        text-shadow: 1px 1px 3px rgba(0,0,0,0.4);
-    }
-    .main-banner .tagline {
-        font-size: 1.2rem;
-        margin: 0;
-        font-style: italic;
-        color: #ffcc00; /* Kuning terang */
-        font-weight: bold;
-        text-shadow: 1px 1px 3px rgba(0,0,0,0.4);
-    }
-    .main-banner .separator {
-        height: 4px;
-        background: linear-gradient(90deg, transparent, #ffcc00, transparent);
-        width: 120px;
-        margin: 25px auto;
-        border-radius: 2px;
     }
 
-    /* Judul Dimensi Dinding dengan gaya futuristik */
-    .dimensi-header {
-        background: linear-gradient(90deg, #1f2a3a 0%, #2a3e54 50%, #3a5871 100%);
-        padding: 18px 30px;
-        border-radius: 15px;
-        margin: 3rem 0 2rem 0; /* Margin lebih besar */
-        color: white;
-        border-left: 8px solid #00aaff; /* Aksen biru terang */
-        box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-        display: flex;
-        align-items: center;
-        gap: 15px;
+    .main-banner .tagline {
+        color: #ffcc00; /* Warna Kuning untuk info Engineered By */
+        font-weight: bold;
+        font-size: 1.1rem;
+        letter-spacing: 2px;
+        text-transform: uppercase;
     }
+
+    /* Styling Judul Dimensi Dinding */
+    .dimensi-header {
+        background: rgba(30, 60, 114, 0.1);
+        padding: 15px 20px;
+        border-radius: 10px;
+        border-left: 6px solid #00f2ff;
+        margin: 2rem 0 1.5rem 0;
+    }
+    
     .dimensi-header h3 {
         margin: 0;
-        font-size: 1.7rem; /* Ukuran font lebih besar */
-        font-weight: 700;
-        letter-spacing: 1.8px;
-        text-transform: uppercase;
-        color: #e0f2f7;
-    }
-    .dimensi-header .icon {
-        font-size: 2rem;
-        color: #00aaff;
-    }
-
-    /* Styling umum untuk input dan tombol */
-    .stSelectbox > div > div {
-        background-color: #1a1f26;
-        color: #e0e0e0;
-        border: 1px solid #333;
-        border-radius: 8px;
-    }
-    .stNumberInput > div > div > input {
-        background-color: #1a1f26;
-        color: #e0e0e0;
-        border: 1px solid #333;
-        border-radius: 8px;
-    }
-    .stButton > button {
-        background-color: #00aaff;
-        color: white;
-        font-weight: bold;
-        border-radius: 10px;
-        padding: 10px 20px;
-        border: none;
-        transition: background-color 0.3s ease, transform 0.2s ease;
-    }
-    .stButton > button:hover {
-        background-color: #007bff;
-        transform: translateY(-2px);
+        color: #00f2ff;
+        font-family: 'Orbitron', sans-serif;
+        font-size: 1.4rem;
     }
 </style>
 """, unsafe_allow_html=True)
 
-# --- TAMPILAN BANNER ATAS ---
+# --- IMPLEMENTASI BANNER ---
 st.markdown("""
 <div class='main-banner'>
-    <h1>🛡️ BundSafe Tank Analytics</h1>
-    <p>Professional Spill Containment & Storage Tank Safety Calculator</p>
-    <div class='separator'></div>
-    <p class='tagline'>Standardized by NFPA 30 | Engineered By. PBJ</p>
+    <div style='display: flex; align-items: center; gap: 20px;'>
+        <div style='font-size: 4rem;'>🛡️</div>
+        <div>
+            <h1>BundSafe Tank Analytics</h1>
+            <p>Professional Spill Containment & Storage Tank Safety Calculator</p>
+            <div style='height: 2px; background: rgba(0, 242, 255, 0.5); width: 150px; margin: 15px 0;'></div>
+            <div class='tagline'>Standardized by NFPA 30 | Engineered By. PBJ</div>
+        </div>
+    </div>
 </div>
 """, unsafe_allow_html=True)
 
-st.markdown("---")
+# --- SISA KODINGAN (INPUT & LOGIC) ---
 
 st.markdown("---")
 shape = st.selectbox("Pilih Bentuk Bundwall:", ["Trapesium", "Persegi"], key="shape_select")
