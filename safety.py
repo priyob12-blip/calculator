@@ -115,31 +115,26 @@ if shape == "Trapesium":
     
     kapasitas_tank_besar = number_input_zero("Kapasitas Tangki Terbesar (KL)", "kapasitas")
     
-    st.subheader("📊 Konfigurasi Tangki & Pondasi (5 Unit)")
+    st.subheader("📊 Data Tangki & Pondasi (5 Unit)")
 
-# Inisialisasi list untuk menampung data
+# List untuk simpan data
 d_pond_bawah = [0]*5
 d_pond_atas = [0]*5
 t_pondasis = [0]*5
 d_tanks = [0]*5
 
 for i in range(5):
-    # Expander berfungsi untuk menyembunyikan/menampilkan input per tangki
-    with st.expander(f"📍 Pengaturan Tangki {i+1}", expanded=False):
-        # Membuat 5 kolom untuk input yang sangat spesifik
-        col1, col2, col3, col4, col5 = st.columns(5)
+    with st.expander(f"Tangki {i+1}"):
+        # Kita pakai 2 kolom supaya tidak terlalu panjang ke bawah
+        col_a, col_b = st.columns(2)
         
-        with col1:
-            d_pond_bawah[i] = st.number_input(f"Ø Bawah (m)", min_value=0.0, step=0.1, key=f"db_{i}")
-        with col2:
-            d_pond_atas[i] = st.number_input(f"Ø Atas (m)", min_value=0.0, step=0.1, key=f"da_{i}")
-        with col3:
-            t_pondasis[i] = st.number_input(f"Tinggi Pond (m)", min_value=0.0, step=0.1, key=f"tp_{i}")
-        with col4:
-            d_tanks[i] = st.number_input(f"Ø Body Tangki (m)", min_value=0.0, step=0.1, key=f"dt_{i}")
-        with col5:
-            st.markdown("###") # Memberikan jarak vertikal agar sejajar dengan input
-            st.caption(f"Status: {'Active' if d_tanks[i] > 0 else 'Empty'}")
+        with col_a:
+            d_pond_bawah[i] = number_input_zero(f"Diameter Bawah Pondasi {i+1} (m)", f"dbawah_{i}")
+            t_pondasis[i] = number_input_zero(f"Tinggi Pondasi {i+1} (m)", f"tpond_{i}")
+            
+        with col_b:
+            d_pond_atas[i] = number_input_zero(f"Diameter Atas Pondasi {i+1} (m)", f"datas_{i}")
+            d_tanks[i] = number_input_zero(f"Diameter Tangki {i+1} (m)", f"dtank_{i}")
             
    # --- 3. INPUT SAFETY DISTANCE (SESUDAH TANGKI+PONDASI) ---
     st.markdown("---")
