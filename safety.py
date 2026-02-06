@@ -117,29 +117,25 @@ if shape == "Trapesium":
     
     st.subheader("📊 Data Tangki & Pondasi (5 Unit)")
 
-# Inisialisasi list untuk menyimpan data
-d_pondasi_bawah = [0]*5
-d_pondasi_atas = [0]*5
+# Inisialisasi list untuk menampung data
+d_pond_bawah = [0]*5
+d_pond_atas = [0]*5
 t_pondasis = [0]*5
 d_tanks = [0]*5
 
 for i in range(5):
-    st.markdown(f"**📍 Konfigurasi Unit {i+1}**")
-    # Membuat 5 kolom untuk input yang sejajar
-    col1, col2, col3, col4, col5 = st.columns(5)
-    
-    with col1:
-        d_pondasi_bawah[i] = number_input_zero(f"Ø Bawah Pondasi (m)", f"d_bawah_{i}")
-    with col2:
-        d_pondasi_atas[i] = number_input_zero(f"Ø Atas Pondasi (m)", f"d_atas_{i}")
-    with col3:
-        t_pondasis[i] = number_input_zero(f"Tinggi Pondasi (m)", f"t_pond_{i}")
-    with col4:
-        d_tanks[i] = number_input_zero(f"Ø Body Tangki (m)", f"d_tank_{i}")
-    with col5:
-        # Kolom kosong atau bisa digunakan untuk info tambahan/status
-        st.write("") 
-        st.caption(f"Unit {i+1} Ready")
+    with st.expander(f"📍 Konfigurasi Tangki {i+1}"):
+        # Menggunakan 4 kolom agar semua parameter frustum masuk
+        col1, col2, col3, col4 = st.columns(4)
+        
+        with col1:
+            d_pond_bawah[i] = number_input_zero(f"Ø Bawah Pondasi {i+1} (m)", f"dbawah_{i}")
+        with col2:
+            d_pond_atas[i] = number_input_zero(f"Ø Atas Pondasi {i+1} (m)", f"datas_{i}")
+        with col3:
+            t_pondasis[i] = number_input_zero(f"Tinggi Pondasi {i+1} (m)", f"tpond_{i}")
+        with col4:
+            d_tanks[i] = number_input_zero(f"Ø Body Tangki {i+1} (m)", f"dtank_{i}")
             
    # --- 3. INPUT SAFETY DISTANCE (SESUDAH TANGKI+PONDASI) ---
     st.markdown("---")
