@@ -117,7 +117,7 @@ if shape == "Trapesium":
     
     st.subheader("📊 Data Tangki & Pondasi (5 Unit)")
 
-# 1. Siapkan list penampung untuk 4 variabel
+# 1. Inisialisasi list (Gunakan nama variabel yang unik)
 d_atas_pond = [0.0] * 5
 d_bawah_pond = [0.0] * 5
 t_pondasis = [0.0] * 5
@@ -127,11 +127,11 @@ for i in range(5):
     with st.expander(f"Tangki {i+1}"):
         col1, col2, col3, col4 = st.columns(4)
         
-        # Pastikan setiap key (parameter kedua) UNIK
-        d_atas_pond[i] = col1.number_input(f"Diameter Atas {i+1} (m)", min_value=0.0, key=f"d_atas_{i}")
-        d_bawah_pond[i] = col2.number_input(f"Diameter Bawah {i+1} (m)", min_value=0.0, key=f"d_bawah_{i}")
-        t_pondasis[i] = col3.number_input(f"Tinggi Pondasi {i+1} (m)", min_value=0.0, key=f"t_pond_{i}")
-        d_tanks[i] = col4.number_input(f"Diameter Tangki {i+1} (m)", min_value=0.0, key=f"d_tank_{i}")
+        # KEY harus unik untuk setiap iterasi dan setiap jenis input
+        d_atas_pond[i] = col1.number_input(f"D Atas {i+1} (m)", min_value=0.0, key=f"atas_{i}")
+        d_bawah_pond[i] = col2.number_input(f"D Bawah {i+1} (m)", min_value=0.0, key=f"bawah_{i}")
+        t_pondasis[i] = col3.number_input(f"T Pondasi {i+1} (m)", min_value=0.0, key=f"tinggi_{i}")
+        d_tanks[i] = col4.number_input(f"D Tangki {i+1} (m)", min_value=0.0, key=f"tank_{i}")
             
    # --- 3. INPUT SAFETY DISTANCE (SESUDAH TANGKI+PONDASI) ---
     st.markdown("---")
