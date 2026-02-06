@@ -116,19 +116,19 @@ if shape == "Trapesium":
     kapasitas_tank_besar = number_input_zero("Kapasitas Tangki Terbesar (KL)", "kapasitas")
     
     st.subheader("📊 Data Tangki & Pondasi (5 Unit)")
-d_pond_bawah = [0.0] * 5
-d_pond_atas = [0.0] * 5
-t_pondasis = [0.0] * 5
-d_tanks = [0.0] * 5
+    d_pondasi1s = [0]*5
+    d_pondasi2s = [0]*5
+    t_pondasis = [0]*5
+    d_tanks = [0]*5
+    
+    for i in range(5):
+        with st.expander(f"Tangki {i+1}"):
+            col1, col2, col3, col4 = st.columns(4)
+            d_pondasi1s[i] = number_input_zero(f"Diameter Pondasi 1 {i+1} (m)", f"dpond_per_{i}")
+            d_pondasi2s[i] = number_input_zero(f"Diameter Pondasi 2 {i+1} (m)", f"dpond_per_{i}")
+            t_pondasis[i] = number_input_zero(f"Tinggi Pondasi {i+1} (m)", f"tpond_per_{i}")
+            d_tanks[i] = number_input_zero(f"Diameter Tangki {i+1} (m)", f"dtank_per_{i}")
 
-for i in range(5):
-    with st.expander(f"Tangki {i+1}"):
-        col1, col2, col3, col4 = st.columns(4)
-        # Gunakan prefix "input_tk_" untuk data tangki
-        d_pond_bawah[i] = number_input_zero(f"Ø Bawah P.{i+1}", f"input_tk_dbawah_{i}")
-        d_pond_atas[i] = number_input_zero(f"Ø Atas P.{i+1}", f"input_tk_datas_{i}")
-        t_pondasis[i] = number_input_zero(f"Tinggi P.{i+1}", f"input_tk_tgi_{i}")
-        d_tanks[i] = number_input_zero(f"Ø Tangki {i+1}", f"input_tk_dtank_{i}")
             
    # --- 3. INPUT SAFETY DISTANCE (SESUDAH TANGKI+PONDASI) ---
     st.markdown("---")
