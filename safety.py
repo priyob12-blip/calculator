@@ -117,7 +117,7 @@ if shape == "Trapesium":
     
     st.subheader("📊 Data Tangki & Pondasi (5 Unit)")
 
-# Inisialisasi list untuk menyimpan 4 jenis inputan
+# Inisialisasi list untuk menyimpan 4 jenis data
 d_pondasis_bawah = [0.0] * 5
 d_pondasis_atas = [0.0] * 5
 t_pondasis = [0.0] * 5
@@ -125,43 +125,28 @@ d_tanks = [0.0] * 5
 
 for i in range(5):
     with st.expander(f"📍 Konfigurasi Tangki {i+1}"):
-        # Menggunakan 2 baris kolom agar input tidak terlalu sempit
-        baris1_col1, baris1_col2 = st.columns(2)
-        baris2_col1, baris2_col2 = st.columns(2)
+        # Membuat 4 kolom sejajar
+        col1, col2, col3, col4 = st.columns(4)
         
-        # Input Baris 1
-        d_pondasis_bawah[i] = baris1_col1.number_input(
-            f"Diameter Pondasi Bawah {i+1} (m)", min_value=0.0, key=f"dpond_bawah_{i}"
-        )
-        d_pondasis_atas[i] = baris1_col2.number_input(
-            f"Diameter Pondasi Atas {i+1} (m)", min_value=0.0, key=f"dpond_atas_{i}"
-        )
-        
-        # Input Baris 2
-        t_pondasis[i] = baris2_col1.number_input(
-            f"Tinggi Pondasi {i+1} (m)", min_value=0.0, key=f"tpond_tr_{i}"
-        )
-        d_tanks[i] = baris2_col2.number_input(
-            f"Diameter Tangki {i+1} (m)", min_value=0.0, key=f"dtank_tr_{i}"
-        )
+        # Baris Inputan
+        d_pondasis_bawah[i] = col1.number_input(f"D Pondasi Bawah {i+1} (m)", min_value=0.0, key=f"dp_bawah_{i}")
+        d_pondasis_atas[i] = col2.number_input(f"D Pondasi Atas {i+1} (m)", min_value=0.0, key=f"dp_atas_{i}")
+        t_pondasis[i] = col3.number_input(f"Tinggi Pondasi {i+1} (m)", min_value=0.0, key=f"tp_{i}")
+        d_tanks[i] = col4.number_input(f"Diameter Tangki {i+1} (m)", min_value=0.0, key=f"dt_{i}")
 
 # --- 3. INPUT SAFETY DISTANCE ---
 st.markdown("---")
 st.markdown("### 🛡️ Safety Distance")
-st.info("Gunakan diameter di bawah ini khusus untuk menentukan jarak aman antar tangki.")
+st.info("Pilih tangki pembanding untuk menentukan jarak aman.")
 
 col_sd1, col_sd2 = st.columns(2)
 
-# Dropdown memilih tangki berdasarkan data yang sudah diinput di atas
-pilih_t1 = col_sd1.selectbox("Pilih Tangki Pembanding 1:", 
-                              options=range(5), 
+# Mengambil data otomatis dari input d_tanks di atas
+pilih_t1 = col_sd1.selectbox("Tangki Pembanding 1:", options=range(5), 
+                              format_func=lambda x: f"Tangki {x+1} (D={d_tanks[x]}m)")
+pilih_t2 = col_sd2.selectbox("Tangki Pembanding 2:", options=range(5), 
                               format_func=lambda x: f"Tangki {x+1} (D={d_tanks[x]}m)")
 
-pilih_t2 = col_sd2.selectbox("Pilih Tangki Pembanding 2:", 
-                              options=range(5), 
-                              format_func=lambda x: f"Tangki {x+1} (D={d_tanks[x]}m)")
-
-# Mengambil diameter tangki secara otomatis
 d_safety_1 = d_tanks[pilih_t1]
 d_safety_2 = d_tanks[pilih_t2]
 
