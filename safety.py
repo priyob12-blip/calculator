@@ -235,13 +235,16 @@ else:  # Persegi
     kapasitas_tank_besar = number_input_zero("Kapasitas Tangki Terbesar (KL)", "kap_per")
     
     st.subheader("📊 Data Tangki & Pondasi (5 Unit)")
-    d_pondasis = [0]*5
+    d_pondasi1s = [0]*5
+    d_pondasi2s = [0]*5
     t_pondasis = [0]*5
     d_tanks = [0]*5
+    
     for i in range(5):
         with st.expander(f"Tangki {i+1}"):
-            col1, col2, col3 = st.columns(3)
-            d_pondasis[i] = number_input_zero(f"Diameter Pondasi {i+1} (m)", f"dpond_per_{i}")
+            col1, col2, col3, col4 = st.columns(4)
+            d_pondasi1s[i] = number_input_zero(f"Diameter Pondasi 1 {i+1} (m)", f"dpond_per_{i}")
+            d_pondasi2s[i] = number_input_zero(f"Diameter Pondasi 2 {i+1} (m)", f"dpond_per_{i}")
             t_pondasis[i] = number_input_zero(f"Tinggi Pondasi {i+1} (m)", f"tpond_per_{i}")
             d_tanks[i] = number_input_zero(f"Diameter Tangki {i+1} (m)", f"dtank_per_{i}")
             
