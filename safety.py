@@ -115,31 +115,17 @@ if shape == "Trapesium":
     
     kapasitas_tank_besar = number_input_zero("Kapasitas Tangki Terbesar (KL)", "kapasitas")
     
-    st.subheader("📊 Data Tangki & Pondasi (5 Unit)")
-
-# Inisialisasi list di luar loop
-d_pond_bawah = [0.0] * 5
-d_pond_atas = [0.0] * 5
-t_pondasis = [0.0] * 5
-d_tanks = [0.0] * 5
-
+    # --- DATA TANGKI (Sama untuk kedua jenis Bundwall) ---
+st.subheader("📊 Data Tangki & Pondasi (5 Unit)")
 for i in range(5):
     with st.expander(f"Tangki {i+1}"):
-        # Menggunakan 4 kolom agar 4 input berjejer rapi secara horizontal
         col1, col2, col3, col4 = st.columns(4)
-        
-        with col1:
-            # Key unik: bwh_{i}
-            d_pond_bawah[i] = number_input_zero(f"Ø Bawah {i+1} (m)", f"bwh_{i}")
-        with col2:
-            # Key unik: ats_{i}
-            d_pond_atas[i] = number_input_zero(f"Ø Atas {i+1} (m)", f"ats_{i}")
-        with col3:
-            # Key unik: tgi_{i}
-            t_pondasis[i] = number_input_zero(f"Tinggi P. {i+1} (m)", f"tgi_{i}")
-        with col4:
-            # Key unik: tnk_{i}
-            d_tanks[i] = number_input_zero(f"Ø Tangki {i+1} (m)", f"tnk_{i}")
+        # Key dibuat unik dengan prefix sesuai tipe bundwall untuk menghindari DuplicateElementKey
+        pfx = "tr" if shape == "Trapesium" else "per"
+        d_pond_bawah[i] = col1.number_input(f"Ø Bawah P.{i+1}", min_value=0.0, key=f"db_{pfx}_{i}")
+        d_pond_atas[i] = col2.number_input(f"Ø Atas P.{i+1}", min_value=0.0, key=f"da_{pfx}_{i}")
+        t_pondasis[i] = col3.number_input(f"Tinggi P.{i+1}", min_value=0.0, key=f"tp_{pfx}_{i}")
+        d_tanks[i] = col4.number_input(f"Ø Tangki {i+1}", min_value=0.0, key=f"dt_{pfx}_{i}")
             
    # --- 3. INPUT SAFETY DISTANCE (SESUDAH TANGKI+PONDASI) ---
     st.markdown("---")
