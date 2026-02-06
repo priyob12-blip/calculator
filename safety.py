@@ -124,12 +124,11 @@ d_tanks = [0.0] * 5
 for i in range(5):
     with st.expander(f"Tangki {i+1}"):
         col1, col2, col3, col4 = st.columns(4)
-        # Menambahkan prefix shape agar key benar-benar unik saat switch mode
-        pfx = "tr" if shape == "Trapesium" else "ps"
-        d_pond_bawah[i] = col1.number_input(f"Ø Bawah P.{i+1}", min_value=0.0, key=f"{pfx}_db_{i}")
-        d_pond_atas[i] = col2.number_input(f"Ø Atas P.{i+1}", min_value=0.0, key=f"{pfx}_da_{i}")
-        t_pondasis[i] = col3.number_input(f"Tinggi P.{i+1}", min_value=0.0, key=f"{pfx}_tp_{i}")
-        d_tanks[i] = col4.number_input(f"Ø Tangki {i+1}", min_value=0.0, key=f"{pfx}_dt_{i}")
+        # Gunakan prefix "input_tk_" untuk data tangki
+        d_pond_bawah[i] = number_input_zero(f"Ø Bawah P.{i+1}", f"input_tk_dbawah_{i}")
+        d_pond_atas[i] = number_input_zero(f"Ø Atas P.{i+1}", f"input_tk_datas_{i}")
+        t_pondasis[i] = number_input_zero(f"Tinggi P.{i+1}", f"input_tk_tgi_{i}")
+        d_tanks[i] = number_input_zero(f"Ø Tangki {i+1}", f"input_tk_dtank_{i}")
             
    # --- 3. INPUT SAFETY DISTANCE (SESUDAH TANGKI+PONDASI) ---
     st.markdown("---")
