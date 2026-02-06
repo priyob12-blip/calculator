@@ -116,17 +116,22 @@ if shape == "Trapesium":
     kapasitas_tank_besar = number_input_zero("Kapasitas Tangki Terbesar (KL)", "kapasitas")
     
     st.subheader("📊 Data Tangki & Pondasi (5 Unit)")
-    d_pondasis = [0]*5
-    t_pondasis = [0]*5
-    d_tanks = [0]*5
-    d_pondasis = [0]*5
-    for i in range(5):
-        with st.expander(f"Tangki {i+1}"):
-            col1, col2, col3,col4 = st.columns(4)
-            d_pondasis[i] = number_input_zero(f"Diameter Atas Pondasi {i+1} (m)", f"dpond_tr_{i}")
-            d_pondasis[i] = number_input_zero(f"Diameter Bawah Pondasi {i+1} (m)", f"dpond_tr_{i}")
-            t_pondasis[i] = number_input_zero(f"Tinggi Pondasi {i+1} (m)", f"tpond_tr_{i}")
-            d_tanks[i] = number_input_zero(f"Diameter Tangki {i+1} (m)", f"dtank_tr_{i}")
+
+# 1. Siapkan list penampung untuk 4 variabel
+d_atas_pond = [0.0] * 5
+d_bawah_pond = [0.0] * 5
+t_pondasis = [0.0] * 5
+d_tanks = [0.0] * 5
+
+for i in range(5):
+    with st.expander(f"Tangki {i+1}"):
+        col1, col2, col3, col4 = st.columns(4)
+        
+        # Pastikan setiap key (parameter kedua) UNIK
+        d_atas_pond[i] = col1.number_input(f"Diameter Atas {i+1} (m)", min_value=0.0, key=f"d_atas_{i}")
+        d_bawah_pond[i] = col2.number_input(f"Diameter Bawah {i+1} (m)", min_value=0.0, key=f"d_bawah_{i}")
+        t_pondasis[i] = col3.number_input(f"Tinggi Pondasi {i+1} (m)", min_value=0.0, key=f"t_pond_{i}")
+        d_tanks[i] = col4.number_input(f"Diameter Tangki {i+1} (m)", min_value=0.0, key=f"d_tank_{i}")
             
    # --- 3. INPUT SAFETY DISTANCE (SESUDAH TANGKI+PONDASI) ---
     st.markdown("---")
