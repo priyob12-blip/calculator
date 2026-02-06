@@ -116,13 +116,15 @@ if shape == "Trapesium":
     kapasitas_tank_besar = number_input_zero("Kapasitas Tangki Terbesar (KL)", "kapasitas")
     
     st.subheader("📊 Data Tangki & Pondasi (5 Unit)")
-    d_pondasis = [0]*5
-    t_pondasis = [0]*5
-    d_tanks = [0]*5
+    d_pond_bawah = [0.0] * 5
+    d_pond_atas = [0.0] * 5
+    t_pondasis = [0.0] * 5
+    d_tanks = [0.0] * 5
     for i in range(5):
         with st.expander(f"Tangki {i+1}"):
             col1, col2, col3 = st.columns(3)
-            d_pondasis[i] = number_input_zero(f"Diameter Pondasi {i+1} (m)", f"dpond_tr_{i}")
+            d_pond_bawah[i] = number_input_zero(f"Diameter Pondasi Bawah {i+1} (m)", f"dpond_tr_{i}")
+            d_pond_atas[i] =  number_input_zero(f"Diameter Pondasi atas {i+1} (m)", f"dpond_tr_{i}")
             t_pondasis[i] = number_input_zero(f"Tinggi Pondasi {i+1} (m)", f"tpond_tr_{i}")
             d_tanks[i] = number_input_zero(f"Diameter Tangki {i+1} (m)", f"dtank_tr_{i}")
             
