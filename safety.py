@@ -7,8 +7,10 @@ st.set_page_config(page_title="BundSafe Tank Analytics", layout="wide")
 # --- CUSTOM CSS UNTUK BANNER TANGKI & UI MODERN ---
 st.markdown("""
 <style>
+    /* Mengatur font agar lebih modern */
     @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Inter:wght@400;700&display=swap');
     
+    /* Banner Utama sesuai gambar yang diinginkan */
     .main-banner {
         background-image: linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.65)), 
         url('https://images.unsplash.com/photo-1516937941344-00b4e0337589?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80');
@@ -16,7 +18,7 @@ st.markdown("""
         background-position: center;
         padding: 5rem 2rem;
         border-radius: 20px;
-        text-align: center;
+        text-align: center; /* Memastikan teks di dalam banner berada di tengah */
         color: white;
         margin-bottom: 2.5rem;
         box-shadow: 0 10px 30px rgba(0,0,0,0.4);
@@ -28,8 +30,9 @@ st.markdown("""
         font-size: 3.5rem;
         margin: 0;
         font-weight: 700;
-        color: #00f2ff;
+        color: #00f2ff; /* Cyan Neon */
         text-shadow: 0 0 15px rgba(0, 242, 255, 0.6);
+        text-align: center; /* Judul Besar Center */
     }
 
     .main-banner p {
@@ -37,6 +40,12 @@ st.markdown("""
         font-size: 1.4rem;
         margin: 10px 0;
         font-weight: 400;
+        text-align: center; /* Sub-judul Center */
+    }
+
+    .tagline-container {
+        text-align: center; /* Wadah tagline center */
+        margin-top: 10px;
     }
 
     .tagline {
@@ -56,13 +65,10 @@ st.markdown("""
 # --- IMPLEMENTASI BANNER ---
 st.markdown("""
 <div class='main-banner'>
-    <div style='display: flex; align-items: center; gap: 20px;'>
-        <div style='font-size: 4rem;'></div>
-        <div>
-            <h1>BundSafe Tank Analytics</h1>
-            <p>Bundwall & Storage Tank Safety Calculator</p>
-            <div class='tagline'>Standardized by NFPA 30 | HSSE SULAWESI </div>
-        </div>
+    <h1>BundSafe Tank Analytics</h1>
+    <p>Bundwall & Storage Tank Safety Calculator</p>
+    <div class='tagline-container'>
+        <div class='tagline'>Standardized by NFPA 30 | HSSE SULAWESI </div>
     </div>
 </div>
 """, unsafe_allow_html=True)
@@ -96,8 +102,8 @@ if shape == "Trapesium":
     
     st.markdown("### 🧱 Dimensi Dinding")
     col4, col5 = st.columns(2)
-    lebar_atas = number_input_zero("Lebar Atas Dinding (m)", "lebar_atas")
-    lebar_bawah = number_input_zero("Lebar Bawah Dinding (m)", "lebar_bawah")
+    lebar_atas = number_input_zero("Lebar Atas (m)", "lebar_atas")
+    lebar_bawah = number_input_zero("Lebar Bawah (m)", "lebar_bawah")
     
     kapasitas_tank_besar = number_input_zero("Kapasitas Tangki Terbesar (KL)", "kapasitas")
     
@@ -134,23 +140,17 @@ if shape == "Trapesium":
             # UPDATE RUMUS: Kerucut Terpancung (Frustum) + Tabung Tenggelam
             vol_pond_tank = 0
             for i in range(5):
-                # 1. Volume Pondasi (Frustum/Kerucut Terpancung)
-                # Rumus: 1/3 * pi * t * (R1^2 + R2^2 + R1*R2)
                 r_atas = d_atas_pond[i] / 2
                 r_bawah = d_bawah_pond[i] / 2
                 v_pondasi = (1/3) * math.pi * t_pondasis[i] * (r_atas**2 + r_bawah**2 + (r_atas * r_bawah))
-                
-                # 2. Volume Tangki yang tenggelam (Tabung)
                 r_tank = d_tanks[i] / 2
                 tinggi_tank_tenggelam = max(0, tinggi_dinding - t_pondasis[i])
                 v_tank = math.pi * (r_tank**2) * tinggi_tank_tenggelam
-                
                 vol_pond_tank += (v_pondasi + v_tank)
             
             vol_efektif_bund = vol_bruto - vol_pond_tank
             status = "✓ COMPLY - AMAN" if vol_efektif_bund > kapasitas_tank_besar * 1.1 and tinggi_dinding <= 1.8 else "✗ NON COMPLY"
 
-            # Kalkulasi Safety Distance
             max_d_s = max(d_safety_1, d_safety_2)
             shell_to_shell = (1/6)*(d_safety_1 + d_safety_2) if max_d_s <= 45 else (1/3)*(d_safety_1 + d_safety_2)
             f_build = 1/6 if (jenis_tank == "Floating Roof" or proteksi == "Proteksi") else 1/3
@@ -215,22 +215,13 @@ else:  # Persegi
                 r_atas = d_atas_pond[i] / 2
                 r_bawah = d_bawah_pond[i] / 2
                 v_pondasi = (1/3) * math.pi * t_pondasis[i] * (r_atas**2 + r_bawah**2 + (r_atas * r_bawah))
-                
                 r_tank = d_tanks[i] / 2
                 tinggi_tank_tenggelam = max(0, tinggi_dinding - t_pondasis[i])
                 v_tank = math.pi * (r_tank**2) * tinggi_tank_tenggelam
-                
                 vol_pond_tank += (v_pondasi + v_tank)
             
             vol_efektif_bund = vol_bruto - vol_pond_tank
             status = "✓ COMPLY - AMAN" if vol_efektif_bund > kapasitas_tank_besar * 1.1 and tinggi_dinding <= 1.8 else "✗ NON COMPLY"
-
-            # Kalkulasi Safety Distance
-            max_d_s = max(d_safety_1, d_safety_2)
-            shell_to_shell = (1/6)*(d_safety_1 + d_safety_2) if max_d_s <= 45 else (1/3)*(d_safety_1 + d_safety_2)
-            f_build = 1/6 if (jenis_tank == "Floating Roof" or proteksi == "Proteksi") else 1/3
-            tank_to_build = round(max(1.5, f_build * d_safety_1), 2)
-            tank_to_property = round(max(1.5, (0.5 if proteksi == "Proteksi" else (1.0 if jenis_tank == "Floating Roof" else 2.0)) * d_safety_1), 2)
 
             st.markdown("### 📈 HASIL PERHITUNGAN")
             col_res1, col_res2, col_res3 = st.columns(3)
