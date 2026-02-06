@@ -117,32 +117,59 @@ if shape == "Trapesium":
     
     st.subheader("📊 Data Tangki & Pondasi (5 Unit)")
 
-# 1. Inisialisasi list (Gunakan nama variabel yang unik)
+# 1. Inisialisasi list penampung data
 d_atas_pond = [0.0] * 5
 d_bawah_pond = [0.0] * 5
 t_pondasis = [0.0] * 5
 d_tanks = [0.0] * 5
 
 for i in range(5):
-    with st.expander(f"Tangki {i+1}"):
+    with st.expander(f"📍 Konfigurasi Tangki {i+1}"):
+        # Membuat 4 kolom untuk 4 inputan
         col1, col2, col3, col4 = st.columns(4)
         
-        # KEY harus unik untuk setiap iterasi dan setiap jenis input
-        d_atas_pond[i] = col1.number_input(f"D Atas {i+1} (m)", min_value=0.0, key=f"atas_{i}")
-        d_bawah_pond[i] = col2.number_input(f"D Bawah {i+1} (m)", min_value=0.0, key=f"bawah_{i}")
-        t_pondasis[i] = col3.number_input(f"T Pondasi {i+1} (m)", min_value=0.0, key=f"tinggi_{i}")
-        d_tanks[i] = col4.number_input(f"D Tangki {i+1} (m)", min_value=0.0, key=f"tank_{i}")
-            
-   # --- 3. INPUT SAFETY DISTANCE (SESUDAH TANGKI+PONDASI) ---
-    st.markdown("---")
-    st.markdown("### 🛡️ Safety Distance")
-    st.info("Gunakan diameter di bawah ini khusus untuk menentukan jarak aman antar tangki.")
-    col_sd1, col_sd2 = st.columns(2)
-    d_safety_1 = col_sd1.number_input("Diameter Tangki Pembanding 1 (m)", min_value=0.0, key="sd_d1")
-    d_safety_2 = col_sd2.number_input("Diameter Tangki Pembanding 2 (m)", min_value=0.0, key="sd_d2")
-    col_prot, col_roof = st.columns(2)
-    proteksi = col_prot.selectbox("Proteksi:", ["Proteksi", "Non Proteksi"], key="prot_tr")
-    jenis_tank = col_roof.selectbox("Jenis Tangki:", ["Fixed Roof", "Floating Roof"], key="jenis_tr")
+        # Input Diameter Atas Pondasi
+        d_atas_pond[i] = col1.number_input(
+            f"D. Atas Pond {i+1} (m)", min_value=0.0, key=f"d_atas_per_{i}"
+        )
+        # Input Diameter Bawah Pondasi
+        d_bawah_pond[i] = col2.number_input(
+            f"D. Bawah Pond {i+1} (m)", min_value=0.0, key=f"d_bawah_per_{i}"
+        )
+        # Input Tinggi Pondasi
+        t_pondasis[i] = col3.number_input(
+            f"Tinggi Pond {i+1} (m)", min_value=0.0, key=f"t_pond_per_{i}"
+        )
+        # Input Diameter Tangki
+        d_tanks[i] = col4.number_input(
+            f"D. Tangki {i+1} (m)", min_value=0.0, key=f"d_tank_per_{i}"
+        )
+
+# --- 2. INPUT SAFETY DISTANCE ---
+st.markdown("---")
+st.markdown("### 🛡️ Safety Distance")
+st.info("Pilih unit tangki yang akan dibandingkan jarak amannya.")
+
+col_sd1, col_sd2 = st.columns(2)
+
+# Menggunakan selectbox agar user tidak perlu ketik ulang diameter
+# Ini otomatis mengambil nilai dari d_tanks di atas
+pilih_t1 = col_sd1.selectbox("Pilih Tangki 1", options=range(5), 
+                              format_func=lambda x: f"Tangki {x+1}", key="pilih_t1_final")
+pilih_t2 = col_sd2.selectbox("Pilih Tangki 2", options=range(5), 
+                              format_func=lambda x: f"Tangki {x+1}", key="pilih_t2_final")
+
+# Mengambil nilai diameter berdasarkan pilihan
+d_safety_1 = d_tanks[pilih_t1]
+d_safety_2 = d_tanks[pilih_t2]
+
+# Menampilkan diameter yang terpilih sebagai info
+col_sd1.caption(f"Diameter: **{d_safety_1} m**")
+col_sd2.caption(f"Diameter: **{d_safety_2} m**")
+
+col_prot, col_roof = st.columns(2)
+proteksi = col_prot.selectbox("Proteksi:", ["Proteksi", "Non Proteksi"], key="prot_safety")
+jenis_tank = col_roof.selectbox("Jenis Tangki:", ["Fixed Roof", "Floating Roof"], key="jenis_safety")
     
     if st.button("💾 HITUNG", type="primary"):
         if panjang_luar == 0 or lebar_luar == 0 or tinggi_dinding == 0:
