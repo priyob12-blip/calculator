@@ -71,13 +71,13 @@ with col_reset:
 
 st.markdown("---")
 
-# Inisialisasi list penampung data tangki
+# Inisialisasi list penampung data tangki (WAJIB di luar if/else agar tidak kosong)
 d_atas_pond = [0.0] * 5
 d_bawah_pond = [0.0] * 5
 t_pondasis = [0.0] * 5
 d_tanks = [0.0] * 5
 
-# --- KONDISI 1: TRAPESIUM ---
+# --- LOGIKA INPUT BERDASARKAN JENIS BUNDWALL ---
 if shape == "Trapesium":
     st.header("📐 Bundwall Trapesium")
     
@@ -104,27 +104,4 @@ if shape == "Trapesium":
     st.markdown("### 🛡️ Safety Distance")
     col_sd1, col_sd2 = st.columns(2)
     d_safety_1 = col_sd1.number_input("Diameter Tangki Pembanding 1 (m)", min_value=0.0, key="sd_d1_tr")
-    d_safety_2 = col_sd2.number_input("Diameter Tangki Pembanding 2 (m)", min_value=0.0, key="sd_d2_tr")
-    
-    col_prot, col_roof = st.columns(2)
-    proteksi = col_prot.selectbox("Proteksi:", ["Proteksi", "Non Proteksi"], key="prot_tr")
-    jenis_tank = col_roof.selectbox("Jenis Tangki:", ["Fixed Roof", "Floating Roof"], key="jenis_tr")
-
-    if st.button("💾 HITUNG", type="primary", key="btn_tr"):
-        if panjang_luar == 0 or lebar_luar == 0 or tinggi_dinding == 0:
-            st.warning("⚠️ Masukkan data bundwall terlebih dahulu!")
-        else:
-            # Kalkulasi Volume Bruto Trapesium
-            t1_a = (panjang_luar - (2 * lebar_bawah))
-            t1_b = (panjang_luar - ((lebar_atas + ((lebar_bawah - lebar_atas) / 2)) * 2))
-            term1 = ((t1_a + t1_b) / 2 * tinggi_dinding) * (lebar_luar - (2 * lebar_bawah))
-            s_val = (lebar_bawah - lebar_atas) / 2
-            term2 = ((lebar_bawah * s_val) / 2) * (panjang_luar - (s_val + lebar_bawah)) * 2
-            vol_bruto = term1 + term2
-
-            # Kalkulasi Pengurang (Pondasi FRUSTUM & Tangki TABUNG)
-            vol_pond_tank = 0
-            for i in range(5):
-                # Volume Pondasi (Frustum)
-                r_a = d_atas_pond[i] / 2
-                r_b = d_bawah_pond
+    d_
