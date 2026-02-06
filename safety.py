@@ -119,7 +119,7 @@ if shape == "Trapesium":
     d_pondasis = [0]*5
     t_pondasis = [0]*5
     d_tanks = [0]*5
-    d-_pondasis = [0]*5
+    d_pondasis = [0]*5
     for i in range(5):
         with st.expander(f"Tangki {i+1}"):
             col1, col2, col3,col4 = st.columns(4)
