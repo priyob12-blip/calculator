@@ -117,24 +117,31 @@ if shape == "Trapesium":
     
     st.subheader("📊 Data Tangki & Pondasi (5 Unit)")
 
-# List untuk simpan data
-d_pond_bawah = [0]*5
-d_pond_atas = [0]*5
-t_pondasis = [0]*5
-d_tanks = [0]*5
+# 1. Inisialisasi list untuk menyimpan input data agar bisa diolah nanti
+d_pond_bawah = [0.0] * 5
+d_pond_atas = [0.0] * 5
+t_pondasis = [0.0] * 5
+d_tanks = [0.0] * 5
+keterangan = [""] * 5
 
+# 2. LOOP UNTUK MEMBUAT 5 EXPANDER TANGKI
 for i in range(5):
-    with st.expander(f"Tangki {i+1}"):
-        # Kita pakai 2 kolom supaya tidak terlalu panjang ke bawah
-        col_a, col_b = st.columns(2)
+    # Setiap iterasi i (0 sampai 4) akan membuat satu expander baru
+    with st.expander(f"📍 Konfigurasi Tangki {i+1}", expanded=False):
         
-        with col_a:
-            d_pond_bawah[i] = number_input_zero(f"Diameter Bawah Pondasi {i+1} (m)", f"dbawah_{i}")
-            t_pondasis[i] = number_input_zero(f"Tinggi Pondasi {i+1} (m)", f"tpond_{i}")
-            
-        with col_b:
-            d_pond_atas[i] = number_input_zero(f"Diameter Atas Pondasi {i+1} (m)", f"datas_{i}")
-            d_tanks[i] = number_input_zero(f"Diameter Tangki {i+1} (m)", f"dtank_{i}")
+        # 3. MEMBUAT 5 KOLOM INPUT DI DALAM SETIAP EXPANDER
+        c1, c2, c3, c4, c5 = st.columns(5)
+        
+        with c1:
+            d_pond_bawah[i] = st.number_input(f"Ø Bawah (m)", min_value=0.0, key=f"db_{i}")
+        with c2:
+            d_pond_atas[i] = st.number_input(f"Ø Atas (m)", min_value=0.0, key=f"da_{i}")
+        with c3:
+            t_pondasis[i] = st.number_input(f"Tinggi P (m)", min_value=0.0, key=f"tp_{i}")
+        with c4:
+            d_tanks[i] = st.number_input(f"Ø Tangki (m)", min_value=0.0, key=f"dt_{i}")
+        with c5:
+            keterangan[i] = st.text_input(f"Tag/Nama", key=f"txt_{i}", placeholder="T-01")
             
    # --- 3. INPUT SAFETY DISTANCE (SESUDAH TANGKI+PONDASI) ---
     st.markdown("---")
