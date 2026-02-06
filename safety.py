@@ -4,13 +4,12 @@ import math
 # Konfigurasi Halaman agar tampil penuh (wide)
 st.set_page_config(page_title="BundSafe Tank Analytics", layout="wide")
 
-# --- CUSTOM CSS UNTUK BANNER TANGKI & UI MODERN ---
+# --- CUSTOM CSS UNTUK UI MODERN & LIST BIRU ---
 st.markdown("""
 <style>
-    /* Mengatur font agar lebih modern */
     @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Inter:wght@400;700&display=swap');
     
-    /* Banner Utama sesuai gambar yang diinginkan */
+    /* Banner Utama */
     .main-banner {
         background-image: linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.65)), 
         url('https://images.unsplash.com/photo-1516937941344-00b4e0337589?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80');
@@ -18,7 +17,7 @@ st.markdown("""
         background-position: center;
         padding: 5rem 2rem;
         border-radius: 20px;
-        text-align: center; /* Memastikan teks di dalam banner berada di tengah */
+        text-align: center;
         color: white;
         margin-bottom: 2.5rem;
         box-shadow: 0 10px 30px rgba(0,0,0,0.4);
@@ -30,21 +29,20 @@ st.markdown("""
         font-size: 3.5rem;
         margin: 0;
         font-weight: 700;
-        color: #00f2ff; /* Cyan Neon */
+        color: #00f2ff;
         text-shadow: 0 0 15px rgba(0, 242, 255, 0.6);
-        text-align: center; /* Judul Besar Center */
+        text-align: center;
     }
 
     .main-banner p {
         font-family: 'Inter', sans-serif;
         font-size: 1.4rem;
         margin: 10px 0;
-        font-weight: 400;
-        text-align: center; /* Sub-judul Center */
+        text-align: center;
     }
 
     .tagline-container {
-        text-align: center; /* Wadah tagline center */
+        text-align: center;
         margin-top: 10px;
     }
 
@@ -58,6 +56,19 @@ st.markdown("""
         font-size: 0.85rem;
         display: inline-block;
         border-radius: 5px;
+    }
+
+    /* --- STYLING LIST BIRU DI SAMPING JUDUL --- */
+    .section-header {
+        border-left: 6px solid #007BFF; /* Garis List Biru */
+        padding-left: 15px;
+        margin-top: 25px;
+        margin-bottom: 15px;
+    }
+    
+    .section-header h2, .section-header h3 {
+        margin: 0;
+        padding: 0;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -93,21 +104,21 @@ t_pondasis = [0.0]*5
 d_tanks = [0.0]*5
 
 if shape == "Trapesium":
-    st.header("📐 Bundwall Trapesium")
+    st.markdown("<div class='section-header'><h2>Bundwall Trapesium</h2></div>", unsafe_allow_html=True)
     
     col1, col2, col3 = st.columns(3)
     panjang_luar = number_input_zero("Panjang Luar (m)", "p_luar")
     lebar_luar = number_input_zero("Lebar Luar (m)", "l_luar")
     tinggi_dinding = number_input_zero("Tinggi Dinding (m)", "t_dinding")
     
-    st.markdown("### 🧱 Dimensi Dinding")
+    st.markdown("<div class='section-header'><h3>Dimensi Dinding</h3></div>", unsafe_allow_html=True)
     col4, col5 = st.columns(2)
     lebar_atas = number_input_zero("Lebar Atas (m)", "lebar_atas")
     lebar_bawah = number_input_zero("Lebar Bawah (m)", "lebar_bawah")
     
     kapasitas_tank_besar = number_input_zero("Kapasitas Tangki Terbesar (KL)", "kapasitas")
     
-    st.subheader("📊 Data Tangki & Pondasi (5 Unit)")
+    st.markdown("<div class='section-header'><h3>Data Tangki & Pondasi (5 Unit)</h3></div>", unsafe_allow_html=True)
     for i in range(5):
         with st.expander(f"Tangki {i+1}"):
             col_t1, col_t2, col_t3, col_t4 = st.columns(4)
@@ -117,7 +128,7 @@ if shape == "Trapesium":
             d_tanks[i] = col_t4.number_input(f"Diameter Tangki {i+1} (m)", min_value=0.0, key=f"d_tank_tr_{i}")
 
     st.markdown("---")
-    st.markdown("### 🛡️ Safety Distance")
+    st.markdown("<div class='section-header'><h3>Safety Distance</h3></div>", unsafe_allow_html=True)
     col_sd1, col_sd2 = st.columns(2)
     d_safety_1 = col_sd1.number_input("Diameter Tangki Pembanding 1 (m)", min_value=0.0, key="sd_d1_tr")
     d_safety_2 = col_sd2.number_input("Diameter Tangki Pembanding 2 (m)", min_value=0.0, key="sd_d2_tr")
@@ -129,7 +140,6 @@ if shape == "Trapesium":
         if panjang_luar == 0 or lebar_luar == 0 or tinggi_dinding == 0:
             st.warning("⚠️ Masukkan data bundwall terlebih dahulu!")
         else:
-            # Volume Bruto Trapesium
             t1_a = (panjang_luar - (2 * lebar_bawah))
             t1_b = (panjang_luar - ((lebar_atas + ((lebar_bawah - lebar_atas) / 2)) * 2))
             term1 = ((t1_a + t1_b) / 2 * tinggi_dinding) * (lebar_luar - (2 * lebar_bawah))
@@ -137,7 +147,6 @@ if shape == "Trapesium":
             term2 = ((lebar_bawah * s_val) / 2) * (panjang_luar - (s_val + lebar_bawah)) * 2
             vol_bruto = term1 + term2
 
-            # UPDATE RUMUS: Kerucut Terpancung (Frustum) + Tabung Tenggelam
             vol_pond_tank = 0
             for i in range(5):
                 r_atas = d_atas_pond[i] / 2
@@ -171,21 +180,21 @@ if shape == "Trapesium":
                 st.metric("Tank to Property (m)", f"{tank_to_property}")
 
 else:  # Persegi
-    st.header("📏 Bundwall Persegi")
+    st.markdown("<div class='section-header'><h2>Bundwall Persegi</h2></div>", unsafe_allow_html=True)
     
     col1, col2, col3 = st.columns(3)
     panjang = number_input_zero("Panjang (m)", "p_per")
     lebar = number_input_zero("Lebar (m)", "l_per")
     tinggi_dinding = number_input_zero("Tinggi Dinding (m)", "t_per")
     
-    st.markdown("### 🧱 Dimensi Dinding")
+    st.markdown("<div class='section-header'><h3>Dimensi Dinding</h3></div>", unsafe_allow_html=True)
     col4, col5 = st.columns(2)
     lebar_dinding = number_input_zero("Lebar Dinding (m)", "ld1_per")
     panjang_tebal_dinding = number_input_zero("Ketebalan Dinding (m)", "ld2_per")
     
     kapasitas_tank_besar = number_input_zero("Kapasitas Tangki Terbesar (KL)", "kap_per")
     
-    st.subheader("📊 Data Tangki & Pondasi (5 Unit)")
+    st.markdown("<div class='section-header'><h3>Data Tangki & Pondasi (5 Unit)</h3></div>", unsafe_allow_html=True)
     for i in range(5):
         with st.expander(f"Tangki {i+1}"):
             col_p1, col_p2, col_p3, col_p4 = st.columns(4)
@@ -194,7 +203,7 @@ else:  # Persegi
             t_pondasis[i] = col_p3.number_input(f"Tinggi Pondasi {i+1} (m)", min_value=0.0, key=f"t_pond_pr_{i}")
             d_tanks[i] = col_p4.number_input(f"Diameter Tangki {i+1} (m)", min_value=0.0, key=f"d_tank_pr_{i}")
 
-    st.markdown("### 🛡️ Safety Distance")
+    st.markdown("<div class='section-header'><h3>Safety Distance</h3></div>", unsafe_allow_html=True)
     col_sd1, col_sd2 = st.columns(2)
     d_safety_1 = col_sd1.number_input("Diameter Tangki Pembanding 1 (m)", min_value=0.0, key="sd_d1_pr")
     d_safety_2 = col_sd2.number_input("Diameter Tangki Pembanding 2 (m)", min_value=0.0, key="sd_d2_pr")
@@ -206,10 +215,8 @@ else:  # Persegi
         if panjang == 0 or lebar == 0:
             st.warning("⚠️ Masukkan data bundwall terlebih dahulu!")
         else:
-            # Volume Bruto Persegi
             vol_bruto = tinggi_dinding * (panjang - 2*lebar_dinding) * (lebar - 2*panjang_tebal_dinding)
             
-            # UPDATE RUMUS: Kerucut Terpancung (Frustum) + Tabung Tenggelam
             vol_pond_tank = 0
             for i in range(5):
                 r_atas = d_atas_pond[i] / 2
