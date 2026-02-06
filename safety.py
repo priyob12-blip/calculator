@@ -119,10 +119,12 @@ if shape == "Trapesium":
     d_pondasis = [0]*5
     t_pondasis = [0]*5
     d_tanks = [0]*5
+    d-_pondasis = [0]*5
     for i in range(5):
         with st.expander(f"Tangki {i+1}"):
-            col1, col2, col3 = st.columns(3)
-            d_pondasis[i] = number_input_zero(f"Diameter Pondasi {i+1} (m)", f"dpond_tr_{i}")
+            col1, col2, col3,col4 = st.columns(4)
+            d_pondasis[i] = number_input_zero(f"Diameter Atas Pondasi {i+1} (m)", f"dpond_tr_{i}")
+            d_pondasis[i] = number_input_zero(f"Diameter Bawah Pondasi {i+1} (m)", f"dpond_tr_{i}")
             t_pondasis[i] = number_input_zero(f"Tinggi Pondasi {i+1} (m)", f"tpond_tr_{i}")
             d_tanks[i] = number_input_zero(f"Diameter Tangki {i+1} (m)", f"dtank_tr_{i}")
             
