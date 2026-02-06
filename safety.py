@@ -115,17 +115,21 @@ if shape == "Trapesium":
     
     kapasitas_tank_besar = number_input_zero("Kapasitas Tangki Terbesar (KL)", "kapasitas")
     
-    # --- DATA TANGKI (Sama untuk kedua jenis Bundwall) ---
-st.subheader("📊 Data Tangki & Pondasi (5 Unit)")
+    st.subheader("📊 Data Tangki & Pondasi (5 Unit)")
+d_pond_bawah = [0.0] * 5
+d_pond_atas = [0.0] * 5
+t_pondasis = [0.0] * 5
+d_tanks = [0.0] * 5
+
 for i in range(5):
     with st.expander(f"Tangki {i+1}"):
         col1, col2, col3, col4 = st.columns(4)
-        # Key dibuat unik dengan prefix sesuai tipe bundwall untuk menghindari DuplicateElementKey
-        pfx = "tr" if shape == "Trapesium" else "per"
-        d_pond_bawah[i] = col1.number_input(f"Ø Bawah P.{i+1}", min_value=0.0, key=f"db_{pfx}_{i}")
-        d_pond_atas[i] = col2.number_input(f"Ø Atas P.{i+1}", min_value=0.0, key=f"da_{pfx}_{i}")
-        t_pondasis[i] = col3.number_input(f"Tinggi P.{i+1}", min_value=0.0, key=f"tp_{pfx}_{i}")
-        d_tanks[i] = col4.number_input(f"Ø Tangki {i+1}", min_value=0.0, key=f"dt_{pfx}_{i}")
+        # Menambahkan prefix shape agar key benar-benar unik saat switch mode
+        pfx = "tr" if shape == "Trapesium" else "ps"
+        d_pond_bawah[i] = col1.number_input(f"Ø Bawah P.{i+1}", min_value=0.0, key=f"{pfx}_db_{i}")
+        d_pond_atas[i] = col2.number_input(f"Ø Atas P.{i+1}", min_value=0.0, key=f"{pfx}_da_{i}")
+        t_pondasis[i] = col3.number_input(f"Tinggi P.{i+1}", min_value=0.0, key=f"{pfx}_tp_{i}")
+        d_tanks[i] = col4.number_input(f"Ø Tangki {i+1}", min_value=0.0, key=f"{pfx}_dt_{i}")
             
    # --- 3. INPUT SAFETY DISTANCE (SESUDAH TANGKI+PONDASI) ---
     st.markdown("---")
