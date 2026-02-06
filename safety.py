@@ -113,11 +113,11 @@ if shape == "Trapesium":
     lebar_atas = number_input_zero("Lebar Atas (m)", "lebar_atas")
     lebar_bawah = number_input_zero("Lebar Bawah (m)", "lebar_bawah")
     
-    kapasitas_tank_besar = number_input_zero("Kapasitas Tangki Terbesar (KL)", "kapasitas")
-    
-    st.subheader("📊 Data Tangki & Pondasi (5 Unit)")
+import streamlit as st
 
-# Inisialisasi list untuk menyimpan 4 jenis data
+# --- BAGIAN DATA TANGKI ---
+st.subheader("📊 Data Tangki & Pondasi (5 Unit)")
+
 d_pondasis_bawah = [0.0] * 5
 d_pondasis_atas = [0.0] * 5
 t_pondasis = [0.0] * 5
@@ -125,34 +125,22 @@ d_tanks = [0.0] * 5
 
 for i in range(5):
     with st.expander(f"📍 Konfigurasi Tangki {i+1}"):
-        # Membuat 4 kolom sejajar
         col1, col2, col3, col4 = st.columns(4)
-        
-        # Baris Inputan
-        d_pondasis_bawah[i] = col1.number_input(f"D Pondasi Bawah {i+1} (m)", min_value=0.0, key=f"dp_bawah_{i}")
-        d_pondasis_atas[i] = col2.number_input(f"D Pondasi Atas {i+1} (m)", min_value=0.0, key=f"dp_atas_{i}")
-        t_pondasis[i] = col3.number_input(f"Tinggi Pondasi {i+1} (m)", min_value=0.0, key=f"tp_{i}")
-        d_tanks[i] = col4.number_input(f"Diameter Tangki {i+1} (m)", min_value=0.0, key=f"dt_{i}")
+        d_pondasis_bawah[i] = col1.number_input(f"D Bawah {i+1} (m)", min_value=0.0, key=f"dpb_{i}")
+        d_pondasis_atas[i] = col2.number_input(f"D Atas {i+1} (m)", min_value=0.0, key=f"dpa_{i}")
+        t_pondasis[i] = col3.number_input(f"T Pondasi {i+1} (m)", min_value=0.0, key=f"tp_{i}")
+        d_tanks[i] = col4.number_input(f"D Tangki {i+1} (m)", min_value=0.0, key=f"dt_{i}")
 
-# --- 3. INPUT SAFETY DISTANCE ---
+# --- BAGIAN SAFETY DISTANCE ---
 st.markdown("---")
 st.markdown("### 🛡️ Safety Distance")
-st.info("Pilih tangki pembanding untuk menentukan jarak aman.")
-
 col_sd1, col_sd2 = st.columns(2)
-
-# Mengambil data otomatis dari input d_tanks di atas
-pilih_t1 = col_sd1.selectbox("Tangki Pembanding 1:", options=range(5), 
-                              format_func=lambda x: f"Tangki {x+1} (D={d_tanks[x]}m)")
-pilih_t2 = col_sd2.selectbox("Tangki Pembanding 2:", options=range(5), 
-                              format_func=lambda x: f"Tangki {x+1} (D={d_tanks[x]}m)")
-
-d_safety_1 = d_tanks[pilih_t1]
-d_safety_2 = d_tanks[pilih_t2]
+pilih_t1 = col_sd1.selectbox("Tangki 1:", options=range(5), format_func=lambda x: f"Tangki {x+1}")
+pilih_t2 = col_sd2.selectbox("Tangki 2:", options=range(5), format_func=lambda x: f"Tangki {x+1}")
 
 col_prot, col_roof = st.columns(2)
-proteksi = col_prot.selectbox("Proteksi:", ["Proteksi", "Non Proteksi"], key="prot_tr")
-jenis_tank = col_roof.selectbox("Jenis Tangki:", ["Fixed Roof", "Floating Roof"], key="jenis_tr")
+proteksi = col_prot.selectbox("Proteksi:", ["Proteksi", "Non Proteksi"])
+jenis_tank = col_roof.selectbox("Jenis Tangki:", ["Fixed Roof", "Floating Roof"])
     
     if st.button("💾 HITUNG", type="primary"):
         if panjang_luar == 0 or lebar_luar == 0 or tinggi_dinding == 0:
