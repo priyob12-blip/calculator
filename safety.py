@@ -158,6 +158,8 @@ if shape == "Trapesium":
                 vol_pond_tank += (v_pondasi + v_tank)
             
             vol_efektif_bund = vol_bruto - vol_pond_tank
+            vol_min = kapasitas_tank_besar * 1.0  # Rumus: Tangki Terbesar * 100%
+            
             status = "✓ COMPLY - AMAN" if vol_efektif_bund > kapasitas_tank_besar * 1.1 and tinggi_dinding <= 1.8 else "✗ NON COMPLY"
 
             max_d_s = max(d_safety_1, d_safety_2)
@@ -167,15 +169,17 @@ if shape == "Trapesium":
             tank_to_property = round(max(1.5, (0.5 if proteksi == "Proteksi" else (1.0 if jenis_tank == "Floating Roof" else 2.0)) * d_safety_1), 2)
 
             st.markdown("### 📈 HASIL PERHITUNGAN")
-            col_res1, col_res2, col_res3 = st.columns(3)
+            col_res1, col_res2, col_res3, col_res4 = st.columns(4)
             with col_res1:
                 st.metric("Volume Bruto (m³)", f"{vol_bruto:.2f}")
                 st.metric("Vol. Pond+Tank (m³)", f"{vol_pond_tank:.2f}")
             with col_res2:
                 st.metric("Vol. Efektif Bund (m³)", f"{vol_efektif_bund:.2f}")
-                st.metric("Status Safety", status)
+                st.metric("Volume Minimum (m³)", f"{vol_min:.2f}")
             with col_res3:
+                st.metric("Status Safety", status)
                 st.metric("Shell to Shell (m)", f"{shell_to_shell:.2f}")
+            with col_res4:
                 st.metric("Tank to Building (m)", f"{tank_to_build}")
                 st.metric("Tank to Property (m)", f"{tank_to_property}")
 
@@ -228,17 +232,28 @@ else:  # Persegi
                 vol_pond_tank += (v_pondasi + v_tank)
             
             vol_efektif_bund = vol_bruto - vol_pond_tank
+            vol_min = kapasitas_tank_besar * 1.0 # Rumus: Tangki Terbesar * 100%
+            
             status = "✓ COMPLY - AMAN" if vol_efektif_bund > kapasitas_tank_besar * 1.1 and tinggi_dinding <= 1.8 else "✗ NON COMPLY"
 
+            # Hitungan safety distance untuk persegi (menggunakan logika yang sama agar variabel terdefinisi)
+            max_d_s = max(d_safety_1, d_safety_2)
+            shell_to_shell = (1/6)*(d_safety_1 + d_safety_2) if max_d_s <= 45 else (1/3)*(d_safety_1 + d_safety_2)
+            f_build = 1/6 if (jenis_tank == "Floating Roof" or proteksi == "Proteksi") else 1/3
+            tank_to_build = round(max(1.5, f_build * d_safety_1), 2)
+            tank_to_property = round(max(1.5, (0.5 if proteksi == "Proteksi" else (1.0 if jenis_tank == "Floating Roof" else 2.0)) * d_safety_1), 2)
+
             st.markdown("### 📈 HASIL PERHITUNGAN")
-            col_res1, col_res2, col_res3 = st.columns(3)
+            col_res1, col_res2, col_res3, col_res4 = st.columns(4)
             with col_res1:
                 st.metric("Volume Bruto (m³)", f"{vol_bruto:.2f}")
                 st.metric("Vol. Pond+Tank (m³)", f"{vol_pond_tank:.2f}")
             with col_res2:
                 st.metric("Vol. Efektif Bund (m³)", f"{vol_efektif_bund:.2f}")
-                st.metric("Status Safety", status)
+                st.metric("Volume Minimum (m³)", f"{vol_min:.2f}")
             with col_res3:
+                st.metric("Status Safety", status)
                 st.metric("Shell to Shell (m)", f"{shell_to_shell:.2f}")
+            with col_res4:
                 st.metric("Tank to Building (m)", f"{tank_to_build}")
                 st.metric("Tank to Property (m)", f"{tank_to_property}")
