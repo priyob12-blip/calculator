@@ -221,7 +221,7 @@ if st.button("💾 HITUNG SEKARANG", type="primary", use_container_width=True):
     
     # Baris 2: Safety Distance SEJAJAR GARIS LURUS
     st.markdown("---")
-    st.write("**Safety Distance Analytics (Garis Lurus):**")
+    st.write("**Safety Distance Analytics :**")
     sd_col1, sd_col2, sd_col3 = st.columns(3)
     sd_col1.metric("Shell to Shell", f"{shell_to_shell:.2f} m")
     sd_col2.metric("Tank to Building", f"{tank_to_build} m")
