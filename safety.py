@@ -202,7 +202,7 @@ if st.button("💾 HITUNG SEKARANG", type="primary", use_container_width=True):
     tank_to_build = round(max(1.5, f_build * d_safety_1), 2)
     tank_to_property = round(max(1.5, (0.5 if proteksi == "Proteksi" else (1.0 if jenis_tank == "Floating Roof" else 2.0)) * d_safety_1), 2)
 
-    is_comply = vol_efektif_bund > kapasitas_tank_besar * 1.1 and tinggi_dinding <= 1.8
+    is_comply = vol_efektif_bund > kapasitas_tank_besar * 1 and tinggi_dinding <= 1.8
     status_class = "status-comply" if is_comply else "status-noncomply"
     status_text = "✓ COMPLY - AMAN" if is_comply else "✗ NON COMPLY"
 
