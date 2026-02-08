@@ -225,9 +225,17 @@ if st.button("💾 HITUNG SEKARANG", type="primary", use_container_width=True):
     st.markdown("---")
     st.write("**Safety Distance Minimum :**")
     sd_col1, sd_col2, sd_col3 = st.columns(3)
+    
+    # Logika Tampilan Jarak Aman
     sd_col1.metric("Shell to Shell", f"{shell_to_shell:.2f} m")
-    sd_col2.metric("Tank to Building", f"{tank_to_build} m")
-    sd_col3.metric("Tank to Property", f"{tank_to_property} m")
+    
+    # Hanya tampil jika d_safety_1 diisi (tidak nol)
+    if d_safety_1 > 0:
+        sd_col2.metric("Tank to Building", f"{tank_to_build} m")
+        sd_col3.metric("Tank to Property", f"{tank_to_property} m")
+    else:
+        sd_col2.write("") # Kosongkan kolom jika tidak ada input
+        sd_col3.write("")
 
     # --- FITUR REKOMENDASI (HIDE-SLIDE) ---
     if not is_comply:
