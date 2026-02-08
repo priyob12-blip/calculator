@@ -33,7 +33,7 @@ st.markdown("""
 
     /* Card Section dengan Slice Biru */
     .custom-card {
-        background: rgba(255, 255, 255, 0.1); /* Ditingkatkan agar kontras dengan teks hitam */
+        background: rgba(255, 255, 255, 0.1);
         border: 1px solid rgba(255, 255, 255, 0.2);
         border-radius: 10px;
         padding: 20px;
@@ -53,7 +53,7 @@ st.markdown("""
         border-radius: 0 0 10px 0;
     }
 
-    /* JUDUL DIUBAH MENJADI HITAM & BOLD */
+    /* JUDUL HITAM & BOLD */
     .section-title {
         font-family: 'Orbitron', sans-serif;
         font-size: 1.5rem;
@@ -175,6 +175,7 @@ else:  # Persegi
 
 # --- LOGIKA PERHITUNGAN & OUTPUT ---
 if st.button("💾 HITUNG SEKARANG", type="primary", use_container_width=True):
+    # Kalkulasi Volume Bruto
     if shape == "Trapesium":
         t1_a = (panjang_luar - (2 * lebar_bawah))
         t1_b = (panjang_luar - ((lebar_atas + ((lebar_bawah - lebar_atas) / 2)) * 2))
@@ -185,6 +186,7 @@ if st.button("💾 HITUNG SEKARANG", type="primary", use_container_width=True):
     else:
         vol_bruto = tinggi_dinding * (panjang - 2*lebar_dinding) * (lebar - 2*panjang_tebal_dinding)
 
+    # Displacement (Dihitung 5 unit seperti di input sebelumnya)
     vol_pond_tank = 0
     for i in range(5):
         r_atas, r_bawah = d_atas_pond[i] / 2, d_bawah_pond[i] / 2
@@ -219,10 +221,42 @@ if st.button("💾 HITUNG SEKARANG", type="primary", use_container_width=True):
         st.write("Status Safety:")
         st.markdown(f"<div class='{status_class}'>{status_text}</div>", unsafe_allow_html=True)
     
-    # Baris 2: Safety Distance SEJAJAR GARIS LURUS
+    # Baris 2: Safety Distance
     st.markdown("---")
     st.write("**Safety Distance Minimum :**")
     sd_col1, sd_col2, sd_col3 = st.columns(3)
     sd_col1.metric("Shell to Shell", f"{shell_to_shell:.2f} m")
     sd_col2.metric("Tank to Building", f"{tank_to_build} m")
     sd_col3.metric("Tank to Property", f"{tank_to_property} m")
+
+    # --- FITUR REKOMENDASI (HIDE-SLIDE) ---
+    if not is_comply:
+        st.markdown("<br>", unsafe_allow_html=True)
+        with st.expander("💡 LIHAT REKOMENDASI PERBAIKAN STRATEGIS"):
+            st.markdown("### Rekomendasi Teknis HSSE")
+            
+            kekurangan = vol_min - vol_efektif_bund
+            
+            rec_col1, rec_col2 = st.columns(2)
+            
+            with rec_col1:
+                st.info("**Opsi Rekayasa Fisik**")
+                # Simulasi sederhana tambahan tinggi
+                luas_estimasi = vol_bruto / tinggi_dinding if tinggi_dinding > 0 else 1
+                tambah_h = kekurangan / luas_estimasi
+                target_h = tinggi_dinding + tambah_h
+                
+                if target_h <= 1.8:
+                    st.write(f"1. **Peninggian Dinding:** Target tinggi dinding baru adalah **{target_h:.2f} m** (Sesuai batas NFPA < 1.8m).")
+                else:
+                    st.write(f"1. **Perluasan Area:** Peninggian dinding hingga 1.8m tidak cukup. Diperlukan perluasan panjang/lebar area.")
+                
+                st.write("2. **Remote Impounding:** Buat saluran peluap ke kolam penampungan sekunder di luar area utama.")
+
+            with rec_col2:
+                st.info("**Opsi Administratif & Operasional**")
+                aman_kl = vol_efektif_bund / 1.0
+                st.write(f"1. **Downgrading Kapasitas:** Batasi pengisian tangki terbesar maksimal hingga **{aman_kl:.2f} KL**.")
+                st.write("2. **Adjustment HLA:** Atur ulang sensor *High Level Alarm* (HLA) sesuai kapasitas bundwall saat ini.")
+                
+            st.warning("⚠️ Perubahan fisik wajib melalui kajian teknis sipil dan pemastian jarak aman (Safety Distance) tetap terjaga.")
