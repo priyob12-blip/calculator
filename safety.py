@@ -233,7 +233,7 @@ if st.button("💾 HITUNG SEKARANG", type="primary", use_container_width=True):
     # --- FITUR REKOMENDASI (HIDE-SLIDE) ---
     if not is_comply:
         st.markdown("<br>", unsafe_allow_html=True)
-        with st.expander("💡 LIHAT REKOMENDASI PERBAIKAN STRATEGIS"):
+        with st.expander("💡 LIHAT REKOMENDASI "):
             st.markdown("### Rekomendasi Teknis HSSE")
             
             kekurangan = vol_min - vol_efektif_bund
