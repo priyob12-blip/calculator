@@ -1,7 +1,7 @@
 import streamlit as st
 import math
 
-# Konfigurasi Halaman (Ini harus menjadi perintah Streamlit pertama)
+# --- KONFIGURASI HALAMAN (Ikon Tab Browser Pulau Sulawesi) ---
 st.set_page_config(
     page_title="BundSafe Tank Analytics", 
     page_icon="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Sulawesi_Silhouette.svg/512px-Sulawesi_Silhouette.svg.png", 
