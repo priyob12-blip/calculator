@@ -2,10 +2,10 @@ import streamlit as st
 import math
 
 # --- KONFIGURASI HALAMAN ---
-# Menambahkan fav icon siluet Pulau Sulawesi pada tab browser
+# Mengganti favicon menjadi ikon Safety Shield yang menarik
 st.set_page_config(
     page_title="BundSafe Tank Analytics", 
-    page_icon="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Sulawesi_Silhouette.svg/512px-Sulawesi_Silhouette.svg.png", 
+    page_icon="🛡️", 
     layout="wide"
 )
 
