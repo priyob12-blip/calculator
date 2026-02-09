@@ -252,7 +252,7 @@ if st.button("💾 HITUNG SEKARANG", type="primary", use_container_width=True):
                 else:
                     st.write(f"1. **Perluasan Area:** Peninggian dinding hingga 1.8m tidak cukup. Diperlukan perluasan panjang/lebar area.")
                 
-                st.write("2.Integrasikan antar bundwall untuk atasi keterbatasan volume. Gunakan sistem Remote Impounding dengan saluran peluap ke kolam sekunder")
+                st.write("2.**Remote Impounding:** Integrasikan antar bundwall untuk atasi keterbatasan volume. Gunakan sistem Remote Impounding dengan saluran peluap ke kolam sekunder")
 
             with rec_col2:
                 st.info("**Opsi Administratif & Operasional**")
