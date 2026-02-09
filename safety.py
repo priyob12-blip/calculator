@@ -2,10 +2,10 @@ import streamlit as st
 import math
 
 # --- KONFIGURASI HALAMAN ---
-# Mengganti favicon menjadi ikon Safety Shield yang menarik
+# Mengganti favicon menjadi logo custom "Shield Tank HSSE" yang lebih modern
 st.set_page_config(
     page_title="BundSafe Tank Analytics", 
-    page_icon="🛡️", 
+    page_icon="https://raw.githubusercontent.com/Arindama/BundSafe/main/logo_shield_tank.png", 
     layout="wide"
 )
 
