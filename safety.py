@@ -59,11 +59,17 @@ def estimate_cap(dia):
     elif dia <= 17.19: return 2500
     elif dia <= 19.10: return 5000
     elif dia <= 27.69: return 10000
+    elif dia <= 30.56: return 12500
+    elif dia <= 33.42: return 15000
+    elif dia <= 40.11: return 20000
+    elif dia <= 43.93: return 25000
+    elif dia <= 48.70: return 30000
     else: return 50000
 
-def get_nfpa_dist(cap, is_class_I_II):
-    # Tabel NFPA 30 Jarak Horizontal Minimum
-    if is_class_I_II:
+def get_nfpa_dist(cap, is_mfo):
+    # Logika diperbaiki agar pas dengan range Tabel NFPA 30
+    if not is_mfo:
+        # Tabel Utama untuk Pertalite, Pertamax, Solar, Avtur (Kelas I, II, IIIA)
         if cap <= 1.045: return 1.5
         elif cap <= 2.85: return 3.0
         elif cap <= 45.6: return 4.5
@@ -72,11 +78,15 @@ def get_nfpa_dist(cap, is_class_I_II):
         elif cap <= 380.0: return 15.0
         elif cap <= 1900.0: return 24.0
         elif cap <= 3800.0: return 30.0
+        elif cap <= 7600.0: return 40.5
+        elif cap <= 11400.0: return 49.5
         else: return 52.5
-    else: # Kelas IIIB (Tabel 6.4)
+    else: 
+        # Tabel 6.4 Khusus MFO (Kelas IIIB)
         if cap <= 45.6: return 1.5
         elif cap <= 114.0: return 3.0
         elif cap <= 190.0: return 3.0
+        elif cap <= 380.0: return 4.5
         else: return 4.5
 
 # --- BAGIAN INPUT UTAMA ---
@@ -87,10 +97,8 @@ with col_reset:
     if st.button("🔄 RESET SYSTEM", use_container_width=True):
         st.rerun()
 
-# Persiapan List Data Tangki
 d_atas_pond, d_bawah_pond, t_pondasis, d_tanks = [0.0]*5, [0.0]*5, [0.0]*5, [0.0]*5
 
-# UI Logic berdasarkan Shape
 if shape == "Trapesium":
     st.markdown("<div class='custom-card'><div class='section-title'>Bundwall Trapesium</div>", unsafe_allow_html=True)
     col1, col2, col3 = st.columns(3)
@@ -116,7 +124,6 @@ if shape == "Trapesium":
             d_tanks[i] = ct4.number_input(f"Diameter Tangki {i+1}", min_value=0.0, key=f"d_tk_tr_{i}")
     st.markdown("</div>", unsafe_allow_html=True)
 
-    # --- FOKUS PERUBAHAN: SAFETY DISTANCE ---
     st.markdown("<div class='custom-card'><div class='section-title'>Safety Distance</div>", unsafe_allow_html=True)
     cs1, cs2, cs3, cs4, cs5 = st.columns(5)
     produk = cs1.selectbox("Jenis BBM:", ["Pertalite", "Pertamax", "Solar", "Avtur", "MFO"], key="prod_tr")
@@ -151,19 +158,17 @@ else:  # Persegi
             d_tanks[i] = cp4.number_input(f"Diameter Tangki {i+1}", min_value=0.0, key=f"d_tk_pr_{i}")
     st.markdown("</div>", unsafe_allow_html=True)
 
-    # --- FOKUS PERUBAHAN: SAFETY DISTANCE ---
     st.markdown("<div class='custom-card'><div class='section-title'>Safety Distance</div>", unsafe_allow_html=True)
     cs1, cs2, cs3, cs4, cs5 = st.columns(5)
     produk = cs1.selectbox("Jenis BBM:", ["Pertalite", "Pertamax", "Solar", "Avtur", "MFO"], key="prod_per")
     d_safety_1 = cs2.number_input("D. Tangki 1 (m)", min_value=0.0, key="sd_d1_pr")
     d_safety_2 = cs3.number_input("D. Tangki 2 (m)", min_value=0.0, key="sd_d2_pr")
-    proteksi = cs3.selectbox("Proteksi:", ["Proteksi", "Non Proteksi"], key="prot_per_sd")
-    jenis_tank = cs4.selectbox("Jenis Tangki:", ["Fixed Roof", "Floating Roof"], key="jenis_per_sd")
+    proteksi = cs4.selectbox("Proteksi:", ["Proteksi", "Non Proteksi"], key="prot_per_sd")
+    jenis_tank = cs5.selectbox("Jenis Tangki:", ["Fixed Roof", "Floating Roof"], key="jenis_per_sd")
     st.markdown("</div>", unsafe_allow_html=True)
 
 # --- LOGIKA PERHITUNGAN & OUTPUT ---
 if st.button("💾 HITUNG SEKARANG", type="primary", use_container_width=True):
-    # Kalkulasi Volume Bruto
     if shape == "Trapesium":
         t1_a = (panjang_luar - (2 * lebar_bawah))
         t1_b = (panjang_luar - ((lebar_atas + ((lebar_bawah - lebar_atas) / 2)) * 2))
@@ -185,9 +190,9 @@ if st.button("💾 HITUNG SEKARANG", type="primary", use_container_width=True):
     vol_min = kapasitas_tank_besar * 1.0
 
     # --- LOGIKA SAFETY DISTANCE TERPADU ---
-    is_class_I_II = produk in ["Pertalite", "Pertamax"]
+    is_mfo = produk == "MFO"
     est_kapasitas = estimate_cap(d_safety_1)
-    min_dist_tabel = get_nfpa_dist(est_kapasitas, is_class_I_II)
+    min_dist_tabel = get_nfpa_dist(est_kapasitas, is_mfo)
     
     max_d_s = max(d_safety_1, d_safety_2)
     shell_to_shell = (1/6)*(d_safety_1 + d_safety_2) if max_d_s <= 45 else (1/3)*(d_safety_1 + d_safety_2)
@@ -217,9 +222,9 @@ if st.button("💾 HITUNG SEKARANG", type="primary", use_container_width=True):
         st.write(f"**Safety Distance Minimum (Trigger NFPA 30 - {produk}):**")
         sd_col1, sd_col2, sd_col3 = st.columns(3)
         sd_col1.metric("Shell to Shell", f"{shell_to_shell:.2f} m")
-        sd_col2.metric("Tank to Building", f"{tank_to_build} m")
-        sd_col3.metric("Tank to Property", f"{tank_to_property} m")
-        st.caption(f"Estimasi Kapasitas: {est_kapasitas} KL. Batas minimum Tabel NFPA 30: {min_dist_tabel} m.")
+        sd_col2.metric("Ke Bangunan", f"{tank_to_build} m")
+        sd_col3.metric("Ke Batas Properti", f"{tank_to_property} m")
+        st.caption(f"Estimasi Kapasitas: {est_kapasitas} KL. Tabel NFPA digunakan: {'6.4 (IIIB)' if is_mfo else 'Utama (I/II/IIIA)'}.")
 
     # --- FITUR REKOMENDASI ---
     if not is_comply:
