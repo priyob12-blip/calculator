@@ -2,7 +2,6 @@ import streamlit as st
 import math
 
 # --- KONFIGURASI HALAMAN ---
-# Mengganti favicon menjadi ikon Safety Shield yang menarik
 st.set_page_config(
     page_title="BundSafe Tank Analytics", 
     page_icon="🛡️", 
@@ -14,7 +13,6 @@ st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Inter:wght@400;700&display=swap');
     
-    /* Banner Utama */
     .main-banner {
         background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
         url('https://images.unsplash.com/photo-1516937941344-00b4e0337589?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80');
@@ -36,7 +34,6 @@ st.markdown("""
         text-shadow: 0 0 15px rgba(0, 242, 255, 0.6);
     }
 
-    /* Card Section dengan Slice Biru */
     .custom-card {
         background: rgba(255, 255, 255, 0.1);
         border: 1px solid rgba(255, 255, 255, 0.2);
@@ -58,7 +55,6 @@ st.markdown("""
         border-radius: 0 0 10px 0;
     }
 
-    /* JUDUL HITAM & BOLD */
     .section-title {
         font-family: 'Orbitron', sans-serif;
         font-size: 1.5rem;
@@ -68,7 +64,6 @@ st.markdown("""
         padding-left: 15px;
     }
 
-    /* Status Label Styling */
     .status-comply {
         color: #00ff88;
         font-family: 'Orbitron', sans-serif;
@@ -191,7 +186,6 @@ if st.button("💾 HITUNG SEKARANG", type="primary", use_container_width=True):
     else:
         vol_bruto = tinggi_dinding * (panjang - 2*lebar_dinding) * (lebar - 2*panjang_tebal_dinding)
 
-    # Displacement (Dihitung 5 unit seperti di input sebelumnya)
     vol_pond_tank = 0
     for i in range(5):
         r_atas, r_bawah = d_atas_pond[i] / 2, d_bawah_pond[i] / 2
@@ -202,12 +196,34 @@ if st.button("💾 HITUNG SEKARANG", type="primary", use_container_width=True):
     vol_efektif_bund = vol_bruto - vol_pond_tank
     vol_min = kapasitas_tank_besar * 1.0
     
-    # Hitung Safety Distance
+    # --- LOGIKA BARU: LOOKUP TABEL NFPA 30 BERDASARKAN KAPASITAS ---
+    def lookup_nfpa_distance(cap):
+        if cap <= 1.045: return 1.5
+        elif cap <= 2.85: return 3.0
+        elif cap <= 45.6: return 4.5
+        elif cap <= 114.0: return 6.0
+        elif cap <= 190.0: return 9.0
+        elif cap <= 380.0: return 15.0
+        elif cap <= 1900.0: return 24.0
+        elif cap <= 3800.0: return 30.0
+        elif cap <= 7600.0: return 40.5
+        elif cap <= 11400.0: return 49.5
+        else: return 52.5
+
+    min_dist_tabel = lookup_nfpa_distance(kapasitas_tank_besar)
+    
+    # Hitung Safety Distance Rumus (Diameter)
     max_d_s = max(d_safety_1, d_safety_2)
     shell_to_shell = (1/6)*(d_safety_1 + d_safety_2) if max_d_s <= 45 else (1/3)*(d_safety_1 + d_safety_2)
+    
     f_build = 1/6 if (jenis_tank == "Floating Roof" or proteksi == "Proteksi") else 1/3
-    tank_to_build = round(max(1.5, f_build * d_safety_1), 2)
-    tank_to_property = round(max(1.5, (0.5 if proteksi == "Proteksi" else (1.0 if jenis_tank == "Floating Roof" else 2.0)) * d_safety_1), 2)
+    
+    # Trigger Ganda: Bandingkan hasil rumus vs Tabel NFPA
+    tank_to_build_calc = f_build * d_safety_1
+    tank_to_build = round(max(min_dist_tabel, tank_to_build_calc, 1.5), 2)
+    
+    f_prop = 0.5 if proteksi == "Proteksi" else (1.0 if jenis_tank == "Floating Roof" else 2.0)
+    tank_to_property = round(max(min_dist_tabel, f_prop * d_safety_1, 1.5), 2)
 
     is_comply = vol_efektif_bund > kapasitas_tank_besar * 1 and tinggi_dinding <= 1.8
     status_class = "status-comply" if is_comply else "status-noncomply"
@@ -215,7 +231,6 @@ if st.button("💾 HITUNG SEKARANG", type="primary", use_container_width=True):
 
     st.markdown(f"### 📈 HASIL ANALISIS")
     
-    # Baris 1: Metrik Volume
     res1, res2, res3, res4 = st.columns(4)
     res1.metric("Volume Bruto", f"{vol_bruto:.2f} m³")
     res1.metric("Vol. Pond+Tank", f"{vol_pond_tank:.2f} m³")
@@ -226,43 +241,37 @@ if st.button("💾 HITUNG SEKARANG", type="primary", use_container_width=True):
         st.write("Status Safety:")
         st.markdown(f"<div class='{status_class}'>{status_text}</div>", unsafe_allow_html=True)
     
-    # Baris 2: Safety Distance (HANYA TAMPIL JIKA d_safety_1 > 0)
     if d_safety_1 > 0:
         st.markdown("---")
-        st.write("**Safety Distance Minimum :**")
+        st.write("**Safety Distance Minimum (Trigger NFPA 30 + Diameter Analysis):**")
         sd_col1, sd_col2, sd_col3 = st.columns(3)
         sd_col1.metric("Shell to Shell", f"{shell_to_shell:.2f} m")
         sd_col2.metric("Tank to Building", f"{tank_to_build} m")
         sd_col3.metric("Tank to Property", f"{tank_to_property} m")
+        st.caption(f"NB: Menggunakan nilai proteksi ganda. Batas minimum Tabel NFPA 30 untuk {kapasitas_tank_besar} KL adalah {min_dist_tabel} m.")
 
-    # --- FITUR REKOMENDASI (HIDE-SLIDE) ---
+    # --- FITUR REKOMENDASI ---
     if not is_comply:
         st.markdown("<br>", unsafe_allow_html=True)
         with st.expander("💡 LIHAT REKOMENDASI "):
             st.markdown("### Rekomendasi Teknis HSSE")
-            
             kekurangan = vol_min - vol_efektif_bund
-            
             rec_col1, rec_col2 = st.columns(2)
             
             with rec_col1:
                 st.info("**Opsi Rekayasa Fisik**")
-                # Simulasi sederhana tambahan tinggi
                 luas_estimasi = vol_bruto / tinggi_dinding if tinggi_dinding > 0 else 1
                 tambah_h = kekurangan / luas_estimasi
                 target_h = tinggi_dinding + tambah_h
-                
                 if target_h <= 1.8:
                     st.write(f"1. **Peninggian Dinding:** Target tinggi dinding baru adalah **{target_h:.2f} m** (Sesuai batas NFPA < 1.8m).")
                 else:
-                    st.write(f"1. **Perluasan Area:** Peninggian dinding hingga 1.8m tidak cukup. Diperlukan perluasan panjang/lebar area.")
-                
-                st.write("2. **Remote Impounding:** Integrasikan antar bundwall untuk atasi keterbatasan volume. Gunakan sistem Remote Impounding dengan saluran peluap ke kolam sekunder")
+                    st.write(f"1. **Perluasan Area:** Peninggian dinding hingga 1.8m tidak cukup. Diperlukan perluasan area.")
+                st.write("2. **Remote Impounding:** Gunakan saluran peluap ke kolam sekunder.")
 
             with rec_col2:
                 st.info("**Opsi Administratif & Operasional**")
                 aman_kl = vol_efektif_bund / 1.0
                 st.write(f"1. **Downgrading Kapasitas:** Batasi pengisian tangki terbesar maksimal hingga **{aman_kl:.2f} KL**.")
-                st.write("2. **Adjustment HLA:** Atur ulang sensor *High Level Alarm* (HLA) sesuai kapasitas bundwall saat ini.")
-                
-            st.warning("⚠️ Perubahan fisik wajib melalui kajian teknis sipil dan pemastian jarak aman (Safety Distance) tetap terjaga.")
+                st.write("2. **Adjustment HLA:** Atur ulang sensor HLA.")
+            st.warning("⚠️ Perubahan fisik wajib melalui kajian teknis sipil.")
