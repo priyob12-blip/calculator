@@ -69,7 +69,6 @@ def estimate_cap(dia):
 def get_nfpa_dist(cap, is_mfo):
     # Logika diperbaiki agar pas dengan range Tabel NFPA 30
     if not is_mfo:
-        # Tabel Utama untuk Pertalite, Pertamax, Solar, Avtur (Kelas I, II, IIIA)
         if cap <= 1.045: return 1.5
         elif cap <= 2.85: return 3.0
         elif cap <= 45.6: return 4.5
@@ -82,7 +81,6 @@ def get_nfpa_dist(cap, is_mfo):
         elif cap <= 11400.0: return 49.5
         else: return 52.5
     else: 
-        # Tabel 6.4 Khusus MFO (Kelas IIIB)
         if cap <= 45.6: return 1.5
         elif cap <= 114.0: return 3.0
         elif cap <= 190.0: return 3.0
@@ -222,8 +220,8 @@ if st.button("💾 HITUNG SEKARANG", type="primary", use_container_width=True):
         st.write(f"**Safety Distance Minimum (Trigger NFPA 30 - {produk}):**")
         sd_col1, sd_col2, sd_col3 = st.columns(3)
         sd_col1.metric("Shell to Shell", f"{shell_to_shell:.2f} m")
-        sd_col2.metric("Ke Bangunan", f"{tank_to_build} m")
-        sd_col3.metric("Ke Batas Properti", f"{tank_to_property} m")
+        sd_col2.metric("Shell to Building", f"{tank_to_build} m")
+        sd_col3.metric("Shell to Property", f"{tank_to_property} m")
         st.caption(f"Estimasi Kapasitas: {est_kapasitas} KL. Tabel NFPA digunakan: {'6.4 (IIIB)' if is_mfo else 'Utama (I/II/IIIA)'}.")
 
     # --- FITUR REKOMENDASI ---
