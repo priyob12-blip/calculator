@@ -68,24 +68,26 @@ def estimate_cap(dia):
 
 def get_nfpa_dist(cap, is_mfo):
     # Logika diperbaiki agar pas dengan range Tabel NFPA 30
+    # dist_a = jarak ke fasilitas/bangunan terdekat
+    # dist_b = jarak ke jalan umum
     if not is_mfo:
-        if cap <= 1.045: return 1.5
-        elif cap <= 2.85: return 3.0
-        elif cap <= 45.6: return 4.5
-        elif cap <= 114.0: return 6.0
-        elif cap <= 190.0: return 9.0
-        elif cap <= 380.0: return 15.0
-        elif cap <= 1900.0: return 24.0
-        elif cap <= 3800.0: return 30.0
-        elif cap <= 7600.0: return 40.5
-        elif cap <= 11400.0: return 49.5
-        else: return 52.5
+        if cap <= 1.045: return 1.5, 1.5
+        elif cap <= 2.85: return 3.0, 1.5
+        elif cap <= 45.6: return 4.5, 1.5
+        elif cap <= 114.0: return 6.0, 1.5
+        elif cap <= 190.0: return 9.0, 3.0
+        elif cap <= 380.0: return 15.0, 4.5
+        elif cap <= 1900.0: return 24.0, 7.5
+        elif cap <= 3800.0: return 30.0, 10.5
+        elif cap <= 7600.0: return 40.5, 13.5
+        elif cap <= 11400.0: return 49.5, 16.5
+        else: return 52.5, 18.0
     else: 
-        if cap <= 45.6: return 1.5
-        elif cap <= 114.0: return 3.0
-        elif cap <= 190.0: return 3.0
-        elif cap <= 380.0: return 4.5
-        else: return 4.5
+        if cap <= 45.6: return 1.5, 1.5
+        elif cap <= 114.0: return 3.0, 1.5
+        elif cap <= 190.0: return 3.0, 3.0
+        elif cap <= 380.0: return 4.5, 3.0
+        else: return 4.5, 4.5
 
 # --- BAGIAN INPUT UTAMA ---
 col_shape, col_reset = st.columns([4, 1])
@@ -190,16 +192,19 @@ if st.button("💾 HITUNG SEKARANG", type="primary", use_container_width=True):
     # --- LOGIKA SAFETY DISTANCE TERPADU ---
     is_mfo = produk == "MFO"
     est_kapasitas = estimate_cap(d_safety_1)
-    min_dist_tabel = get_nfpa_dist(est_kapasitas, is_mfo)
+    min_dist_fac, min_dist_road = get_nfpa_dist(est_kapasitas, is_mfo) # dist_road ke jalan, dist_fac ke properti
     
     max_d_s = max(d_safety_1, d_safety_2)
     shell_to_shell = (1/6)*(d_safety_1 + d_safety_2) if max_d_s <= 45 else (1/3)*(d_safety_1 + d_safety_2)
     
     f_build = 1/6 if (jenis_tank == "Floating Roof" or proteksi == "Proteksi") else 1/3
-    tank_to_build = round(max(min_dist_tabel, f_build * d_safety_1, 1.5), 2)
     
+    # Shell to Building: Jarak ke Jalan Umum/Internal
+    tank_to_road = round(max(min_dist_road, f_build * d_safety_1, 1.5), 2)
+    
+    # Shell to Property: Jarak ke Fasilitas Bangunan/Batas Properti
     f_prop = 0.5 if proteksi == "Proteksi" else (1.0 if jenis_tank == "Floating Roof" else 2.0)
-    tank_to_property = round(max(min_dist_tabel, f_prop * d_safety_1, 1.5), 2)
+    tank_to_prop = round(max(min_dist_fac, f_prop * d_safety_1, 1.5), 2)
 
     is_comply = vol_efektif_bund > kapasitas_tank_besar * 1 and tinggi_dinding <= 1.8
     status_class = "status-comply" if is_comply else "status-noncomply"
@@ -220,8 +225,8 @@ if st.button("💾 HITUNG SEKARANG", type="primary", use_container_width=True):
         st.write(f"**Safety Distance Minimum (Trigger NFPA 30 - {produk}):**")
         sd_col1, sd_col2, sd_col3 = st.columns(3)
         sd_col1.metric("Shell to Shell", f"{shell_to_shell:.2f} m")
-        sd_col2.metric("Shell to Building", f"{tank_to_build} m")
-        sd_col3.metric("Shell to Property", f"{tank_to_property} m")
+        sd_col2.metric("Shell to Building", f"{tank_to_road} m") # Merujuk ke Jalan
+        sd_col3.metric("Shell to Property", f"{tank_to_prop} m") # Merujuk ke Fasilitas/Bangunan
         st.caption(f"Estimasi Kapasitas: {est_kapasitas} KL. Tabel NFPA digunakan: {'6.4 (IIIB)' if is_mfo else 'Utama (I/II/IIIA)'}.")
 
     # --- FITUR REKOMENDASI ---
