@@ -16,68 +16,22 @@ st.markdown("""
     .main-banner {
         background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
         url('https://images.unsplash.com/photo-1516937941344-00b4e0337589?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80');
-        background-size: cover;
-        background-position: center;
-        padding: 4rem 2rem;
-        border-radius: 20px;
-        text-align: center;
-        color: white;
-        margin-bottom: 2.5rem;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        border: 1px solid rgba(255,255,255,0.1);
+        background-size: cover; background-position: center; padding: 4rem 2rem;
+        border-radius: 20px; text-align: center; color: white; margin-bottom: 2.5rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1);
     }
-
-    .main-banner h1 {
-        font-family: 'Orbitron', sans-serif;
-        font-size: 3.5rem;
-        color: #00f2ff;
-        text-shadow: 0 0 15px rgba(0, 242, 255, 0.6);
-    }
-
+    .main-banner h1 { font-family: 'Orbitron', sans-serif; font-size: 3.5rem; color: #00f2ff; text-shadow: 0 0 15px rgba(0, 242, 255, 0.6); }
     .custom-card {
-        background: rgba(255, 255, 255, 0.1);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        border-radius: 10px;
-        padding: 20px;
-        margin-bottom: 25px;
-        position: relative;
-        overflow: hidden;
+        background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 10px; padding: 20px; margin-bottom: 25px; position: relative; overflow: hidden;
     }
-
     .custom-card::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 10px;
-        height: 40px;
-        background: #007BFF;
-        border-radius: 0 0 10px 0;
+        content: ""; position: absolute; top: 0; left: 0; width: 10px; height: 40px;
+        background: #007BFF; border-radius: 0 0 10px 0;
     }
-
-    .section-title {
-        font-family: 'Orbitron', sans-serif;
-        font-size: 1.5rem;
-        font-weight: 800;
-        color: #000000; 
-        margin-bottom: 20px;
-        padding-left: 15px;
-    }
-
-    .status-comply {
-        color: #00ff88;
-        font-family: 'Orbitron', sans-serif;
-        font-size: 1.2rem;
-        font-weight: bold;
-        text-shadow: 0 0 10px rgba(0, 255, 136, 0.4);
-    }
-    .status-noncomply {
-        color: #ff4b4b;
-        font-family: 'Orbitron', sans-serif;
-        font-size: 1.2rem;
-        font-weight: bold;
-        text-shadow: 0 0 10px rgba(255, 75, 75, 0.4);
-    }
+    .section-title { font-family: 'Orbitron', sans-serif; font-size: 1.5rem; font-weight: 800; color: #000000; margin-bottom: 20px; padding-left: 15px; }
+    .status-comply { color: #00ff88; font-family: 'Orbitron', sans-serif; font-size: 1.2rem; font-weight: bold; }
+    .status-noncomply { color: #ff4b4b; font-family: 'Orbitron', sans-serif; font-size: 1.2rem; font-weight: bold; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -92,6 +46,39 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
+# --- FUNGSI PEMBANTU SAFETY DISTANCE ---
+def estimate_cap(dia):
+    # Mapping Diameter ke Kapasitas sesuai Tabel 4
+    if dia <= 6.68: return 150
+    elif dia <= 7.64: return 200
+    elif dia <= 8.59: return 250
+    elif dia <= 9.55: return 500
+    elif dia <= 11.46: return 700
+    elif dia <= 13.37: return 1500
+    elif dia <= 15.28: return 2000
+    elif dia <= 17.19: return 2500
+    elif dia <= 19.10: return 5000
+    elif dia <= 27.69: return 10000
+    else: return 50000
+
+def get_nfpa_dist(cap, is_class_I_II):
+    # Tabel NFPA 30 Jarak Horizontal Minimum
+    if is_class_I_II:
+        if cap <= 1.045: return 1.5
+        elif cap <= 2.85: return 3.0
+        elif cap <= 45.6: return 4.5
+        elif cap <= 114.0: return 6.0
+        elif cap <= 190.0: return 9.0
+        elif cap <= 380.0: return 15.0
+        elif cap <= 1900.0: return 24.0
+        elif cap <= 3800.0: return 30.0
+        else: return 52.5
+    else: # Kelas IIIB (Tabel 6.4)
+        if cap <= 45.6: return 1.5
+        elif cap <= 114.0: return 3.0
+        elif cap <= 190.0: return 3.0
+        else: return 4.5
+
 # --- BAGIAN INPUT UTAMA ---
 col_shape, col_reset = st.columns([4, 1])
 with col_shape:
@@ -99,9 +86,6 @@ with col_shape:
 with col_reset:
     if st.button("🔄 RESET SYSTEM", use_container_width=True):
         st.rerun()
-
-def number_input_zero(label, key):
-    return st.number_input(label, min_value=0.0, value=0.0, key=key)
 
 # Persiapan List Data Tangki
 d_atas_pond, d_bawah_pond, t_pondasis, d_tanks = [0.0]*5, [0.0]*5, [0.0]*5, [0.0]*5
@@ -132,12 +116,14 @@ if shape == "Trapesium":
             d_tanks[i] = ct4.number_input(f"Diameter Tangki {i+1}", min_value=0.0, key=f"d_tk_tr_{i}")
     st.markdown("</div>", unsafe_allow_html=True)
 
+    # --- FOKUS PERUBAHAN: SAFETY DISTANCE ---
     st.markdown("<div class='custom-card'><div class='section-title'>Safety Distance</div>", unsafe_allow_html=True)
-    cs1, cs2, cs3, cs4 = st.columns(4)
-    d_safety_1 = cs1.number_input("D. Tangki 1 (m)", min_value=0.0, key="sd_d1_tr")
-    d_safety_2 = cs2.number_input("D. Tangki 2 (m)", min_value=0.0, key="sd_d2_tr")
-    proteksi = cs3.selectbox("Proteksi:", ["Proteksi", "Non Proteksi"], key="prot_tr")
-    jenis_tank = cs4.selectbox("Jenis Tangki:", ["Fixed Roof", "Floating Roof"], key="jenis_tr")
+    cs1, cs2, cs3, cs4, cs5 = st.columns(5)
+    produk = cs1.selectbox("Jenis BBM:", ["Pertalite", "Pertamax", "Solar", "Avtur", "MFO"], key="prod_tr")
+    d_safety_1 = cs2.number_input("D. Tangki 1 (m)", min_value=0.0, key="sd_d1_tr")
+    d_safety_2 = cs3.number_input("D. Tangki 2 (m)", min_value=0.0, key="sd_d2_tr")
+    proteksi = cs4.selectbox("Proteksi:", ["Proteksi", "Non Proteksi"], key="prot_tr")
+    jenis_tank = cs5.selectbox("Jenis Tangki:", ["Fixed Roof", "Floating Roof"], key="jenis_tr")
     st.markdown("</div>", unsafe_allow_html=True)
 
 else:  # Persegi
@@ -165,10 +151,12 @@ else:  # Persegi
             d_tanks[i] = cp4.number_input(f"Diameter Tangki {i+1}", min_value=0.0, key=f"d_tk_pr_{i}")
     st.markdown("</div>", unsafe_allow_html=True)
 
+    # --- FOKUS PERUBAHAN: SAFETY DISTANCE ---
     st.markdown("<div class='custom-card'><div class='section-title'>Safety Distance</div>", unsafe_allow_html=True)
-    cs1, cs2, cs3, cs4 = st.columns(4)
-    d_safety_1 = cs1.number_input("D. Tangki 1 (m)", min_value=0.0, key="sd_d1_pr")
-    d_safety_2 = cs2.number_input("D. Tangki 2 (m)", min_value=0.0, key="sd_d2_pr")
+    cs1, cs2, cs3, cs4, cs5 = st.columns(5)
+    produk = cs1.selectbox("Jenis BBM:", ["Pertalite", "Pertamax", "Solar", "Avtur", "MFO"], key="prod_per")
+    d_safety_1 = cs2.number_input("D. Tangki 1 (m)", min_value=0.0, key="sd_d1_pr")
+    d_safety_2 = cs3.number_input("D. Tangki 2 (m)", min_value=0.0, key="sd_d2_pr")
     proteksi = cs3.selectbox("Proteksi:", ["Proteksi", "Non Proteksi"], key="prot_per_sd")
     jenis_tank = cs4.selectbox("Jenis Tangki:", ["Fixed Roof", "Floating Roof"], key="jenis_per_sd")
     st.markdown("</div>", unsafe_allow_html=True)
@@ -195,32 +183,17 @@ if st.button("💾 HITUNG SEKARANG", type="primary", use_container_width=True):
     
     vol_efektif_bund = vol_bruto - vol_pond_tank
     vol_min = kapasitas_tank_besar * 1.0
-    
-    # --- LOGIKA BARU: LOOKUP TABEL NFPA 30 BERDASARKAN KAPASITAS ---
-    def lookup_nfpa_distance(cap):
-        if cap <= 1.045: return 1.5
-        elif cap <= 2.85: return 3.0
-        elif cap <= 45.6: return 4.5
-        elif cap <= 114.0: return 6.0
-        elif cap <= 190.0: return 9.0
-        elif cap <= 380.0: return 15.0
-        elif cap <= 1900.0: return 24.0
-        elif cap <= 3800.0: return 30.0
-        elif cap <= 7600.0: return 40.5
-        elif cap <= 11400.0: return 49.5
-        else: return 52.5
 
-    min_dist_tabel = lookup_nfpa_distance(kapasitas_tank_besar)
+    # --- LOGIKA SAFETY DISTANCE TERPADU ---
+    is_class_I_II = produk in ["Pertalite", "Pertamax"]
+    est_kapasitas = estimate_cap(d_safety_1)
+    min_dist_tabel = get_nfpa_dist(est_kapasitas, is_class_I_II)
     
-    # Hitung Safety Distance Rumus (Diameter)
     max_d_s = max(d_safety_1, d_safety_2)
     shell_to_shell = (1/6)*(d_safety_1 + d_safety_2) if max_d_s <= 45 else (1/3)*(d_safety_1 + d_safety_2)
     
     f_build = 1/6 if (jenis_tank == "Floating Roof" or proteksi == "Proteksi") else 1/3
-    
-    # Trigger Ganda: Bandingkan hasil rumus vs Tabel NFPA
-    tank_to_build_calc = f_build * d_safety_1
-    tank_to_build = round(max(min_dist_tabel, tank_to_build_calc, 1.5), 2)
+    tank_to_build = round(max(min_dist_tabel, f_build * d_safety_1, 1.5), 2)
     
     f_prop = 0.5 if proteksi == "Proteksi" else (1.0 if jenis_tank == "Floating Roof" else 2.0)
     tank_to_property = round(max(min_dist_tabel, f_prop * d_safety_1, 1.5), 2)
@@ -230,25 +203,23 @@ if st.button("💾 HITUNG SEKARANG", type="primary", use_container_width=True):
     status_text = "✓ COMPLY - AMAN" if is_comply else "✗ NON COMPLY"
 
     st.markdown(f"### 📈 HASIL ANALISIS")
-    
     res1, res2, res3, res4 = st.columns(4)
     res1.metric("Volume Bruto", f"{vol_bruto:.2f} m³")
     res1.metric("Vol. Pond+Tank", f"{vol_pond_tank:.2f} m³")
     res2.metric("Vol. Efektif Bund", f"{vol_efektif_bund:.2f} m³")
     res2.metric("Volume Minimum", f"{vol_min:.2f} m³")
-    
     with res3:
         st.write("Status Safety:")
         st.markdown(f"<div class='{status_class}'>{status_text}</div>", unsafe_allow_html=True)
     
     if d_safety_1 > 0:
         st.markdown("---")
-        st.write("**Safety Distance Minimum (Trigger NFPA 30 + Diameter Analysis):**")
+        st.write(f"**Safety Distance Minimum (Trigger NFPA 30 - {produk}):**")
         sd_col1, sd_col2, sd_col3 = st.columns(3)
         sd_col1.metric("Shell to Shell", f"{shell_to_shell:.2f} m")
         sd_col2.metric("Tank to Building", f"{tank_to_build} m")
         sd_col3.metric("Tank to Property", f"{tank_to_property} m")
-        st.caption(f"NB: Menggunakan nilai proteksi ganda. Batas minimum Tabel NFPA 30 untuk {kapasitas_tank_besar} KL adalah {min_dist_tabel} m.")
+        st.caption(f"Estimasi Kapasitas: {est_kapasitas} KL. Batas minimum Tabel NFPA 30: {min_dist_tabel} m.")
 
     # --- FITUR REKOMENDASI ---
     if not is_comply:
@@ -257,21 +228,18 @@ if st.button("💾 HITUNG SEKARANG", type="primary", use_container_width=True):
             st.markdown("### Rekomendasi Teknis HSSE")
             kekurangan = vol_min - vol_efektif_bund
             rec_col1, rec_col2 = st.columns(2)
-            
             with rec_col1:
                 st.info("**Opsi Rekayasa Fisik**")
                 luas_estimasi = vol_bruto / tinggi_dinding if tinggi_dinding > 0 else 1
                 tambah_h = kekurangan / luas_estimasi
                 target_h = tinggi_dinding + tambah_h
                 if target_h <= 1.8:
-                    st.write(f"1. **Peninggian Dinding:** Target tinggi dinding baru adalah **{target_h:.2f} m** (Sesuai batas NFPA < 1.8m).")
+                    st.write(f"1. **Peninggian Dinding:** Target baru: **{target_h:.2f} m**.")
                 else:
-                    st.write(f"1. **Perluasan Area:** Peninggian dinding hingga 1.8m tidak cukup. Diperlukan perluasan area.")
+                    st.write(f"1. **Perluasan Area:** Peninggian dinding > 1.8m tidak disarankan.")
                 st.write("2. **Remote Impounding:** Gunakan saluran peluap ke kolam sekunder.")
-
             with rec_col2:
-                st.info("**Opsi Administratif & Operasional**")
-                aman_kl = vol_efektif_bund / 1.0
-                st.write(f"1. **Downgrading Kapasitas:** Batasi pengisian tangki terbesar maksimal hingga **{aman_kl:.2f} KL**.")
-                st.write("2. **Adjustment HLA:** Atur ulang sensor HLA.")
-            st.warning("⚠️ Perubahan fisik wajib melalui kajian teknis sipil.")
+                st.info("**Opsi Administratif**")
+                st.write(f"1. **Downgrading:** Batasi isi tangki max **{vol_efektif_bund:.2f} KL**.")
+                st.write("2. **Adjustment HLA:** Atur ulang sensor High Level Alarm.")
+            st.warning("⚠️ Perubahan fisik wajib melalui kajian teknis.")
