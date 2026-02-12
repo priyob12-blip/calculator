@@ -222,7 +222,7 @@ if st.button("💾 HITUNG SEKARANG", type="primary", use_container_width=True):
     
     if d_safety_1 > 0:
         st.markdown("---")
-        st.write(f"**Safety Distance Minimum (Trigger NFPA 30 - {produk}):**")
+        st.write(f"**Safety Distance Minimum (NFPA 30 - {produk}):**")
         sd_col1, sd_col2, sd_col3 = st.columns(3)
         sd_col1.metric("Shell to Shell", f"{shell_to_shell:.2f} m")
         sd_col2.metric("Shell to Building", f"{tank_to_road} m") # Merujuk ke Jalan
