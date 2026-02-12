@@ -4,7 +4,7 @@ import math
 # --- KONFIGURASI HALAMAN ---
 st.set_page_config(
     page_title="BundSafe Tank Analytics", 
-    page_icon="🛡️", 
+    page_icon="⚡", 
     layout="wide"
 )
 
