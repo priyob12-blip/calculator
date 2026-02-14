@@ -125,7 +125,7 @@ if shape == "Trapesium":
     st.markdown("</div>", unsafe_allow_html=True)
 
     st.markdown("<div class='custom-card'><div class='section-title'>Safety Distance</div>", unsafe_allow_html=True)
-    cs1, cs2, cs3 = st.columns(3)
+    cs1, cs2, cs3, cs4, cs5 = st.columns(5)
     produk = cs1.selectbox("Jenis BBM:", ["Pertalite", "Pertamax", "Solar", "Avtur", "MFO"], key="prod_tr")
     d_safety_1 = cs2.number_input("D. Tangki 1 (m)", min_value=0.0, key="sd_d1_tr")
     d_safety_2 = cs3.number_input("D. Tangki 2 (m)", min_value=0.0, key="sd_d2_tr")
