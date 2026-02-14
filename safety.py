@@ -4,7 +4,7 @@ import math
 # --- KONFIGURASI HALAMAN ---
 st.set_page_config(
     page_title="BundSafe Tank Analytics", 
-    page_icon="🛡️", 
+    page_icon="⚡", 
     layout="wide"
 )
 
@@ -144,110 +144,4 @@ else:  # Persegi
     st.markdown("<div class='custom-card'><div class='section-title'>Dimensi Dinding</div>", unsafe_allow_html=True)
     col4, col5, col6 = st.columns(3)
     lebar_dinding = col4.number_input("Lebar Dinding (m)", min_value=0.0, key="ld1_per")
-    panjang_tebal_dinding = col5.number_input("Ketebalan Dinding (m)", min_value=0.0, key="ld2_per")
-    kapasitas_tank_besar = col6.number_input("Kapasitas Tangki Terbesar (KL)", min_value=0.0, key="kap_per")
-    st.markdown("</div>", unsafe_allow_html=True)
-
-    st.markdown("<div class='custom-card'><div class='section-title'>Data Tangki & Pondasi (5 Unit)</div>", unsafe_allow_html=True)
-    for i in range(5):
-        with st.expander(f"Tangki {i+1}"):
-            cp1, cp2, cp3, cp4 = st.columns(4)
-            d_atas_pond[i] = cp1.number_input(f"D. Atas Pondasi {i+1}", min_value=0.0, key=f"d_at_pr_{i}")
-            d_bawah_pond[i] = cp2.number_input(f"D. Bawah Pondasi {i+1}", min_value=0.0, key=f"d_bw_pr_{i}")
-            t_pondasis[i] = cp3.number_input(f"Tinggi Pondasi {i+1}", min_value=0.0, key=f"t_pd_pr_{i}")
-            d_tanks[i] = cp4.number_input(f"Diameter Tangki {i+1}", min_value=0.0, key=f"d_tk_pr_{i}")
-    st.markdown("</div>", unsafe_allow_html=True)
-
-    st.markdown("<div class='custom-card'><div class='section-title'>Safety Distance</div>", unsafe_allow_html=True)
-    cs1, cs2, cs3, cs4, cs5 = st.columns(5)
-    produk = cs1.selectbox("Jenis BBM:", ["Pertalite", "Pertamax", "Solar", "Avtur", "MFO"], key="prod_per")
-    d_safety_1 = cs2.number_input("D. Tangki 1 (m)", min_value=0.0, key="sd_d1_pr")
-    d_safety_2 = cs3.number_input("D. Tangki 2 (m)", min_value=0.0, key="sd_d2_pr")
-    proteksi = cs4.selectbox("Proteksi:", ["Proteksi", "Non Proteksi"], key="prot_per_sd")
-    jenis_tank = cs5.selectbox("Jenis Tangki:", ["Fixed Roof", "Floating Roof"], key="jenis_per_sd")
-    st.markdown("</div>", unsafe_allow_html=True)
-
-# --- LOGIKA PERHITUNGAN & OUTPUT ---
-if st.button("💾 HITUNG SEKARANG", type="primary", use_container_width=True):
-    if shape == "Trapesium":
-        t1_a = (panjang_luar - (2 * lebar_bawah))
-        t1_b = (panjang_luar - ((lebar_atas + ((lebar_bawah - lebar_atas) / 2)) * 2))
-        term1 = ((t1_a + t1_b) / 2 * tinggi_dinding) * (lebar_luar - (2 * lebar_bawah))
-        s_val = (lebar_bawah - lebar_atas) / 2
-        term2 = ((lebar_bawah * s_val) / 2) * (panjang_luar - (s_val + lebar_bawah)) * 2
-        vol_bruto = term1 + term2
-    else:
-        vol_bruto = tinggi_dinding * (panjang - 2*lebar_dinding) * (lebar - 2*panjang_tebal_dinding)
-
-    vol_pond_tank = 0
-    for i in range(5):
-        r_atas, r_bawah = d_atas_pond[i] / 2, d_bawah_pond[i] / 2
-        v_pondasi = (1/3) * math.pi * t_pondasis[i] * (r_atas**2 + r_bawah**2 + (r_atas * r_bawah))
-        v_tank = math.pi * (d_tanks[i]/2)**2 * max(0, tinggi_dinding - t_pondasis[i])
-        vol_pond_tank += (v_pondasi + v_tank)
-    
-    vol_efektif_bund = vol_bruto - vol_pond_tank
-    vol_min = kapasitas_tank_besar * 1.0
-
-    # --- LOGIKA SAFETY DISTANCE TERPADU ---
-    is_mfo = produk == "MFO"
-    est_kapasitas = estimate_cap(d_safety_1)
-    min_dist_fac, min_dist_road = get_nfpa_dist(est_kapasitas, is_mfo) # dist_road ke jalan, dist_fac ke properti
-    
-    max_d_s = max(d_safety_1, d_safety_2)
-    shell_to_shell = (1/6)*(d_safety_1 + d_safety_2) if max_d_s <= 45 else (1/3)*(d_safety_1 + d_safety_2)
-    
-    f_build = 1/6 if (jenis_tank == "Floating Roof" or proteksi == "Proteksi") else 1/3
-    
-    # Shell to Building: Jarak ke Jalan Umum/Internal
-    tank_to_road = round(max(min_dist_road, f_build * d_safety_1, 1.5), 2)
-    
-    # Shell to Property: Jarak ke Fasilitas Bangunan/Batas Properti
-    f_prop = 0.5 if proteksi == "Proteksi" else (1.0 if jenis_tank == "Floating Roof" else 2.0)
-    tank_to_prop = round(max(min_dist_fac, f_prop * d_safety_1, 1.5), 2)
-
-    is_comply = vol_efektif_bund > kapasitas_tank_besar * 1 and tinggi_dinding <= 1.8
-    status_class = "status-comply" if is_comply else "status-noncomply"
-    status_text = "✓ COMPLY - AMAN" if is_comply else "✗ NON COMPLY"
-
-    st.markdown(f"### 📈 HASIL ANALISIS")
-    res1, res2, res3, res4 = st.columns(4)
-    res1.metric("Volume Bruto", f"{vol_bruto:.2f} m³")
-    res1.metric("Vol. Pond+Tank", f"{vol_pond_tank:.2f} m³")
-    res2.metric("Vol. Efektif Bund", f"{vol_efektif_bund:.2f} m³")
-    res2.metric("Volume Minimum", f"{vol_min:.2f} m³")
-    with res3:
-        st.write("Status Safety:")
-        st.markdown(f"<div class='{status_class}'>{status_text}</div>", unsafe_allow_html=True)
-    
-    if d_safety_1 > 0:
-        st.markdown("---")
-        st.write(f"**Safety Distance Minimum (Trigger NFPA 30 - {produk}):**")
-        sd_col1, sd_col2, sd_col3 = st.columns(3)
-        sd_col1.metric("Shell to Shell", f"{shell_to_shell:.2f} m")
-        sd_col2.metric("Shell to Building", f"{tank_to_road} m") # Merujuk ke Jalan
-        sd_col3.metric("Shell to Property", f"{tank_to_prop} m") # Merujuk ke Fasilitas/Bangunan
-        st.caption(f"Estimasi Kapasitas: {est_kapasitas} KL. Tabel NFPA digunakan: {'6.4 (IIIB)' if is_mfo else 'Utama (I/II/IIIA)'}.")
-
-    # --- FITUR REKOMENDASI ---
-    if not is_comply:
-        st.markdown("<br>", unsafe_allow_html=True)
-        with st.expander("💡 LIHAT REKOMENDASI "):
-            st.markdown("### Rekomendasi Teknis HSSE")
-            kekurangan = vol_min - vol_efektif_bund
-            rec_col1, rec_col2 = st.columns(2)
-            with rec_col1:
-                st.info("**Opsi Rekayasa Fisik**")
-                luas_estimasi = vol_bruto / tinggi_dinding if tinggi_dinding > 0 else 1
-                tambah_h = kekurangan / luas_estimasi
-                target_h = tinggi_dinding + tambah_h
-                if target_h <= 1.8:
-                    st.write(f"1. **Peninggian Dinding:** Target baru: **{target_h:.2f} m**.")
-                else:
-                    st.write(f"1. **Perluasan Area:** Peninggian dinding > 1.8m tidak disarankan.")
-                st.write("2. **Remote Impounding:** Gunakan saluran peluap ke kolam sekunder.")
-            with rec_col2:
-                st.info("**Opsi Administratif**")
-                st.write(f"1. **Downgrading:** Batasi isi tangki max **{vol_efektif_bund:.2f} KL**.")
-                st.write("2. **Adjustment HLA:** Atur ulang sensor High Level Alarm.")
-            st.warning("⚠️ Perubahan fisik wajib melalui kajian teknis.")
+    panjang_tebal_dinding = col5.number_input("
