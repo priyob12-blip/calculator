@@ -142,7 +142,6 @@ else:  # Persegi
     st.markdown("<div class='custom-card'><div class='section-title'>Dimensi Dinding</div>", unsafe_allow_html=True)
     col4, col5, col6 = st.columns(3)
     lebar_dinding = col4.number_input("Lebar Dinding (m)", min_value=0.0, key="ld1_per")
-    # Baris ini yang sebelumnya error, sekarang sudah diperbaiki string-nya
     panjang_tebal_dinding = col5.number_input("Ketebalan Dinding (m)", min_value=0.0, key="ld2_per")
     kapasitas_tank_besar = col6.number_input("Kapasitas Tangki Terbesar (KL)", min_value=0.0, key="kap_per")
     st.markdown("</div>", unsafe_allow_html=True)
@@ -194,8 +193,7 @@ if st.button("💾 HITUNG SEKARANG", type="primary", use_container_width=True):
     max_d_s = max(d_safety_1, d_safety_2)
     shell_to_shell = (1/6)*(d_safety_1 + d_safety_2) if max_d_s <= 45 else (1/3)*(d_safety_1 + d_safety_2)
     
-    f_build = 1/6 if (False) else 1/3 # Dummy logic karena input proteksi dihapus, asumsi conservative 1/3 (Non Proteksi)
-    
+    # f_build logic removed as per user request (Dummy logic kept if needed for future or simply removed)
     # OUTPUT LANGSUNG DARI TABEL
     tank_to_road = min_dist_road # Shell to Building (Jalan)
     tank_to_prop = min_dist_fac  # Shell to Property (Bangunan/Fasilitas)
@@ -221,7 +219,8 @@ if st.button("💾 HITUNG SEKARANG", type="primary", use_container_width=True):
         sd_col1.metric("Shell to Shell", f"{shell_to_shell:.2f} m")
         sd_col2.metric("Shell to Building", f"{tank_to_road} m") # Merujuk ke Jalan
         sd_col3.metric("Shell to Property", f"{tank_to_prop} m") # Merujuk ke Fasilitas/Bangunan
-        st.caption(f"Estimasi Kapasitas: {est_kapasitas} KL. Tabel NFPA digunakan: {'6.4 (IIIB)' if is_mfo else 'Utama (I/II/IIIA)'}.")
+        caption_text = f"Estimasi Kapasitas: {est_kapasitas} KL. Tabel NFPA digunakan: {'6.4 (IIIB)' if is_mfo else 'Utama (I/II/IIIA)'}."
+        st.caption(caption_text)
 
     # --- FITUR REKOMENDASI ---
     if not is_comply:
@@ -229,19 +228,26 @@ if st.button("💾 HITUNG SEKARANG", type="primary", use_container_width=True):
         with st.expander("💡 LIHAT REKOMENDASI "):
             st.markdown("### Rekomendasi Teknis HSSE")
             kekurangan = vol_min - vol_efektif_bund
+            
             rec_col1, rec_col2 = st.columns(2)
+            
             with rec_col1:
                 st.info("**Opsi Rekayasa Fisik**")
                 luas_estimasi = vol_bruto / tinggi_dinding if tinggi_dinding > 0 else 1
                 tambah_h = kekurangan / luas_estimasi
                 target_h = tinggi_dinding + tambah_h
+                
                 if target_h <= 1.8:
-                    st.write(f"1. **Peninggian Dinding:** Target baru: **{target_h:.2f} m**.")
+                    st.write(f"1. **Peninggian Dinding:** Target tinggi dinding baru adalah **{target_h:.2f} m** (Sesuai batas NFPA < 1.8m).")
                 else:
-                    st.write(f"1. **Perluasan Area:** Peninggian dinding > 1.8m tidak disarankan.")
-                st.write("2. **Remote Impounding:** Gunakan saluran peluap ke kolam sekunder.")
+                    st.write(f"1. **Perluasan Area:** Peninggian dinding hingga 1.8m tidak cukup. Diperlukan perluasan panjang/lebar area.")
+                
+                st.write("2. **Remote Impounding:** Integrasikan antar bundwall untuk atasi keterbatasan volume. Gunakan sistem Remote Impounding dengan saluran peluap ke kolam sekunder")
+
             with rec_col2:
-                st.info("**Opsi Administratif**")
-                st.write(f"1. **Downgrading:** Batasi isi tangki max **{vol_efektif_bund:.2f} KL**.")
-                st.write("2. **Adjustment HLA:** Atur ulang sensor High Level Alarm.")
-            st.warning("⚠️ Perubahan fisik wajib melalui kajian teknis.")
+                st.info("**Opsi Administratif & Operasional**")
+                aman_kl = vol_efektif_bund / 1.0
+                st.write(f"1. **Downgrading Kapasitas:** Batasi pengisian tangki terbesar maksimal hingga **{aman_kl:.2f} KL**.")
+                st.write("2. **Adjustment HLA:** Atur ulang sensor *High Level Alarm* (HLA) sesuai kapasitas bundwall saat ini.")
+                
+            st.warning("⚠️ Perubahan fisik wajib melalui kajian teknis sipil dan pemastian jarak aman (Safety Distance) tetap terjaga.")
