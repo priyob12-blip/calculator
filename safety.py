@@ -66,28 +66,22 @@ def estimate_cap(dia):
     elif dia <= 48.70: return 30000
     else: return 50000
 
-def get_nfpa_dist(cap, is_mfo):
-    # Logika diperbaiki agar pas dengan range Tabel NFPA 30
-    # dist_a = jarak ke fasilitas/bangunan terdekat (Nilai Besar)
-    # dist_b = jarak ke jalan umum (Nilai Kecil)
-    if not is_mfo:
-        if cap <= 1.045: return 1.5, 1.5
-        elif cap <= 2.85: return 3.0, 1.5
-        elif cap <= 45.6: return 4.5, 1.5
-        elif cap <= 114.0: return 6.0, 1.5
-        elif cap <= 190.0: return 9.0, 3.0
-        elif cap <= 380.0: return 15.0, 4.5
-        elif cap <= 1900.0: return 24.0, 7.5
-        elif cap <= 3800.0: return 30.0, 10.5
-        elif cap <= 7600.0: return 40.5, 13.5
-        elif cap <= 11400.0: return 49.5, 16.5
-        else: return 52.5, 18.0
-    else: 
-        if cap <= 45.6: return 1.5, 1.5
-        elif cap <= 114.0: return 3.0, 1.5
-        elif cap <= 190.0: return 3.0, 3.0
-        elif cap <= 380.0: return 4.5, 3.0
-        else: return 4.5, 4.5
+def get_nfpa_dist(cap):
+    # Logika TUNGGAL untuk Kelas I, II, dan IIIA (Pertalite, Pertamax, Solar, MFO)
+    # dist_fac = Jarak ke Fasilitas/Bangunan (Kolom Tengah Tabel - Nilai Besar)
+    # dist_road = Jarak ke Jalan Umum/Sisi Terdekat (Kolom Kanan Tabel - Nilai Kecil)
+    
+    if cap <= 1.045: return 1.5, 1.5
+    elif cap <= 2.85: return 3.0, 1.5
+    elif cap <= 45.6: return 4.5, 1.5
+    elif cap <= 114.0: return 6.0, 1.5
+    elif cap <= 190.0: return 9.0, 3.0
+    elif cap <= 380.0: return 15.0, 4.5
+    elif cap <= 1900.0: return 24.0, 7.5
+    elif cap <= 3800.0: return 30.0, 10.5
+    elif cap <= 7600.0: return 40.5, 13.5
+    elif cap <= 11400.0: return 49.5, 16.5
+    else: return 52.5, 18.0
 
 # --- BAGIAN INPUT UTAMA ---
 col_shape, col_reset = st.columns([4, 1])
@@ -168,91 +162,4 @@ if st.button("💾 HITUNG SEKARANG", type="primary", use_container_width=True):
     if shape == "Trapesium":
         t1_a = (panjang_luar - (2 * lebar_bawah))
         t1_b = (panjang_luar - ((lebar_atas + ((lebar_bawah - lebar_atas) / 2)) * 2))
-        term1 = ((t1_a + t1_b) / 2 * tinggi_dinding) * (lebar_luar - (2 * lebar_bawah))
-        s_val = (lebar_bawah - lebar_atas) / 2
-        term2 = ((lebar_bawah * s_val) / 2) * (panjang_luar - (s_val + lebar_bawah)) * 2
-        vol_bruto = term1 + term2
-    else:
-        vol_bruto = tinggi_dinding * (panjang - 2*lebar_dinding) * (lebar - 2*panjang_tebal_dinding)
-
-    vol_pond_tank = 0
-    for i in range(5):
-        r_atas, r_bawah = d_atas_pond[i] / 2, d_bawah_pond[i] / 2
-        v_pondasi = (1/3) * math.pi * t_pondasis[i] * (r_atas**2 + r_bawah**2 + (r_atas * r_bawah))
-        v_tank = math.pi * (d_tanks[i]/2)**2 * max(0, tinggi_dinding - t_pondasis[i])
-        vol_pond_tank += (v_pondasi + v_tank)
-    
-    vol_efektif_bund = vol_bruto - vol_pond_tank
-    vol_min = kapasitas_tank_besar * 1.0
-
-    # --- LOGIKA SAFETY DISTANCE SEDERHANA ---
-    is_mfo = produk == "MFO"
-    est_kapasitas = estimate_cap(d_safety_1)
-    
-    # min_dist_fac (nilai besar) dan min_dist_road (nilai kecil) diambil langsung dari tabel
-    min_dist_fac, min_dist_road = get_nfpa_dist(est_kapasitas, is_mfo) 
-    
-    max_d_s = max(d_safety_1, d_safety_2)
-    shell_to_shell = (1/6)*(d_safety_1 + d_safety_2) if max_d_s <= 45 else (1/3)*(d_safety_1 + d_safety_2)
-    
-    # f_build logic removed (dummy if needed)
-    
-    # OUTPUT DIBALIKKAN SESUAI PERMINTAAN AWAL
-    # Shell to Building -> Menggunakan Nilai Kecil (Jalan/Road)
-    # Shell to Property -> Menggunakan Nilai Besar (Fasilitas/Property Line)
-    tank_to_road = min_dist_road 
-    tank_to_prop = min_dist_fac  
-
-    is_comply = vol_efektif_bund > kapasitas_tank_besar * 1 and tinggi_dinding <= 1.8
-    status_class = "status-comply" if is_comply else "status-noncomply"
-    status_text = "✓ COMPLY - AMAN" if is_comply else "✗ NON COMPLY"
-
-    st.markdown(f"### 📈 HASIL ANALISIS")
-    res1, res2, res3, res4 = st.columns(4)
-    res1.metric("Volume Bruto", f"{vol_bruto:.2f} m³")
-    res1.metric("Vol. Pond+Tank", f"{vol_pond_tank:.2f} m³")
-    res2.metric("Vol. Efektif Bund", f"{vol_efektif_bund:.2f} m³")
-    res2.metric("Volume Minimum", f"{vol_min:.2f} m³")
-    with res3:
-        st.write("Status Safety:")
-        st.markdown(f"<div class='{status_class}'>{status_text}</div>", unsafe_allow_html=True)
-    
-    if d_safety_1 > 0:
-        st.markdown("---")
-        st.write(f"**Safety Distance Minimum (NFPA 30 - {produk}):**")
-        sd_col1, sd_col2, sd_col3 = st.columns(3)
-        sd_col1.metric("Shell to Shell", f"{shell_to_shell:.2f} m")
-        sd_col2.metric("Shell to Building", f"{tank_to_road} m") # Merujuk ke Jalan (Nilai Kecil)
-        sd_col3.metric("Shell to Property", f"{tank_to_prop} m") # Merujuk ke Properti (Nilai Besar)
-        caption_text = f"Estimasi Kapasitas: {est_kapasitas} KL. Tabel NFPA digunakan: {'6.4 (IIIB)' if is_mfo else 'Utama (I/II/IIIA)'}."
-        st.caption(caption_text)
-
-    # --- FITUR REKOMENDASI ---
-    if not is_comply:
-        st.markdown("<br>", unsafe_allow_html=True)
-        with st.expander("💡 LIHAT REKOMENDASI "):
-            st.markdown("### Rekomendasi Teknis HSSE")
-            kekurangan = vol_min - vol_efektif_bund
-            
-            rec_col1, rec_col2 = st.columns(2)
-            
-            with rec_col1:
-                st.info("**Opsi Rekayasa Fisik**")
-                luas_estimasi = vol_bruto / tinggi_dinding if tinggi_dinding > 0 else 1
-                tambah_h = kekurangan / luas_estimasi
-                target_h = tinggi_dinding + tambah_h
-                
-                if target_h <= 1.8:
-                    st.write(f"1. **Peninggian Dinding:** Target tinggi dinding baru adalah **{target_h:.2f} m** (Sesuai batas NFPA < 1.8m).")
-                else:
-                    st.write(f"1. **Perluasan Area:** Peninggian dinding hingga 1.8m tidak cukup. Diperlukan perluasan panjang/lebar area.")
-                
-                st.write("2. **Remote Impounding:** Integrasikan antar bundwall untuk atasi keterbatasan volume. Gunakan sistem Remote Impounding dengan saluran peluap ke kolam sekunder")
-
-            with rec_col2:
-                st.info("**Opsi Administratif & Operasional**")
-                aman_kl = vol_efektif_bund / 1.0
-                st.write(f"1. **Downgrading Kapasitas:** Batasi pengisian tangki terbesar maksimal hingga **{aman_kl:.2f} KL**.")
-                st.write("2. **Adjustment HLA:** Atur ulang sensor *High Level Alarm* (HLA) sesuai kapasitas bundwall saat ini.")
-                
-            st.warning("⚠️ Perubahan fisik wajib melalui kajian teknis sipil dan pemastian jarak aman (Safety Distance) tetap terjaga.")
+        term1 =
