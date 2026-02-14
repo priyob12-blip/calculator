@@ -31,4 +31,63 @@ st.markdown("""
     }
     .section-title { font-family: 'Orbitron', sans-serif; font-size: 1.5rem; font-weight: 800; color: #000000; margin-bottom: 20px; padding-left: 15px; }
     .status-comply { color: #00ff88; font-family: 'Orbitron', sans-serif; font-size: 1.2rem; font-weight: bold; }
-    .status-noncomply { color: #ff4b4b; font-
+    .status-noncomply { color: #ff4b4b; font-family: 'Orbitron', sans-serif; font-size: 1.2rem; font-weight: bold; }
+</style>
+""", unsafe_allow_html=True)
+
+# --- IMPLEMENTASI BANNER ---
+st.markdown("""
+<div class='main-banner'>
+    <h1>BundSafe Tank Analytics</h1>
+    <p>Bundwall & Storage Tank Safety Calculator</p>
+    <div style='text-align: center; margin-top: 10px;'>
+        <span style='background: #ffcc00; color: #000; padding: 5px 15px; font-weight: bold; border-radius: 5px;'>Standardized by NFPA 30 | HSSE SULAWESI</span>
+    </div>
+</div>
+""", unsafe_allow_html=True)
+
+# --- FUNGSI PEMBANTU SAFETY DISTANCE ---
+def estimate_cap(dia):
+    # Mapping Diameter ke Kapasitas sesuai Tabel 4
+    if dia <= 6.68: return 150
+    elif dia <= 7.64: return 200
+    elif dia <= 8.59: return 250
+    elif dia <= 9.55: return 500
+    elif dia <= 11.46: return 700
+    elif dia <= 13.37: return 1500
+    elif dia <= 15.28: return 2000
+    elif dia <= 17.19: return 2500
+    elif dia <= 19.10: return 5000
+    elif dia <= 27.69: return 10000
+    elif dia <= 30.56: return 12500
+    elif dia <= 33.42: return 15000
+    elif dia <= 40.11: return 20000
+    elif dia <= 43.93: return 25000
+    elif dia <= 48.70: return 30000
+    else: return 50000
+
+def get_nfpa_dist(cap, is_mfo):
+    # Mengembalikan nilai MUTLAK dari tabel NFPA tanpa faktor pengali
+    # dist_prop = Jarak ke Fasilitas/Bangunan (Kolom Tengah Tabel)
+    # dist_build = Jarak ke Jalan Umum/Sisi Terdekat (Kolom Kanan Tabel)
+    
+    if not is_mfo:
+        # Tabel Utama (Kelas I, II, IIIA)
+        if cap <= 1.045: return 1.5, 1.5
+        elif cap <= 2.85: return 3.0, 1.5
+        elif cap <= 45.6: return 4.5, 1.5
+        elif cap <= 114.0: return 6.0, 1.5
+        elif cap <= 190.0: return 9.0, 3.0
+        elif cap <= 380.0: return 15.0, 4.5
+        elif cap <= 1900.0: return 24.0, 7.5
+        elif cap <= 3800.0: return 30.0, 10.5
+        elif cap <= 7600.0: return 40.5, 13.5
+        elif cap <= 11400.0: return 49.5, 16.5
+        else: return 52.5, 18.0
+    else: 
+        # Tabel 6.4 (Kelas IIIB - MFO)
+        if cap <= 45.6: return 1.5, 1.5
+        elif cap <= 114.0: return 3.0, 1.5
+        elif cap <= 190.0: return 3.0, 3.0
+        elif cap <= 380.0: return 4.5, 3.0
+        else: return 4.5, 4.
