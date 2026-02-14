@@ -224,7 +224,7 @@ if st.button("💾 HITUNG SEKARANG", type="primary", use_container_width=True):
         sd_col2.metric("Shell to Building", f"{tank_to_road} m") # Langsung dari Tabel
         sd_col3.metric("Shell to Property", f"{tank_to_prop} m") # Langsung dari Tabel
         # Baris caption diperbaiki agar aman dari SyntaxError
-        caption_text = f"Estimasi Kapasitas: {est_kapasitas} KL. Menggunakan nilai mutlak tabel NFPA tanpa faktor reduksi proteksi."
+        caption_text = f"Estimasi Kapasitas: {est_kapasitas} KL."
         st.caption(caption_text)
 
     # --- FITUR REKOMENDASI ---
