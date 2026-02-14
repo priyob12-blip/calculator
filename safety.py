@@ -225,7 +225,7 @@ if st.button("💾 HITUNG SEKARANG", type="primary", use_container_width=True):
         sd_col1.metric("Shell to Shell", f"{shell_to_shell:.2f} m")
         sd_col2.metric("Shell to Building", f"{tank_to_road} m") # Langsung dari Tabel
         sd_col3.metric("Shell to Property", f"{tank_to_prop} m") # Langsung dari Tabel
-        st.caption(f"Estimasi Kapasitas: {est_kapasitas} KL.)
+        st.caption(f"Estimasi Kapasitas: {est_kapasitas} KL.
 
     # --- FITUR REKOMENDASI ---
     if not is_comply:
