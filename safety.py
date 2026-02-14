@@ -67,7 +67,8 @@ def estimate_cap(dia):
     else: return 50000
 
 def get_nfpa_dist(cap):
-    # Logika TUNGGAL untuk Kelas I, II, dan IIIA (Pertalite, Pertamax, Solar, MFO)
+    # Logika diperbaiki agar pas dengan range Tabel NFPA 30
+    # Mengembalikan nilai MUTLAK dari tabel NFPA (Tabel Kiri/Utama untuk semua Kelas I, II, IIIA)
     # dist_fac = Jarak ke Fasilitas/Bangunan (Kolom Tengah Tabel - Nilai Besar)
     # dist_road = Jarak ke Jalan Umum/Sisi Terdekat (Kolom Kanan Tabel - Nilai Kecil)
     
@@ -159,7 +160,101 @@ else:  # Persegi
 
 # --- LOGIKA PERHITUNGAN & OUTPUT ---
 if st.button("💾 HITUNG SEKARANG", type="primary", use_container_width=True):
+    # --- RUMUS ASLI (KOMPLEKS) UNTUK VOLUME BRUTO ---
     if shape == "Trapesium":
         t1_a = (panjang_luar - (2 * lebar_bawah))
         t1_b = (panjang_luar - ((lebar_atas + ((lebar_bawah - lebar_atas) / 2)) * 2))
-        term1 =
+        term1 = ((t1_a + t1_b) / 2 * tinggi_dinding) * (lebar_luar - (2 * lebar_bawah))
+        s_val = (lebar_bawah - lebar_atas) / 2
+        term2 = ((lebar_bawah * s_val) / 2) * (panjang_luar - (s_val + lebar_bawah)) * 2
+        vol_bruto = term1 + term2
+    else:
+        vol_bruto = tinggi_dinding * (panjang - 2*lebar_dinding) * (lebar - 2*panjang_tebal_dinding)
+
+    vol_pond_tank = 0
+    for i in range(5):
+        r_atas, r_bawah = d_atas_pond[i] / 2, d_bawah_pond[i] / 2
+        v_pondasi = (1/3) * math.pi * t_pondasis[i] * (r_atas**2 + r_bawah**2 + (r_atas * r_bawah))
+        v_tank = math.pi * (d_tanks[i]/2)**2 * max(0, tinggi_dinding - t_pondasis[i])
+        vol_pond_tank += (v_pondasi + v_tank)
+    
+    vol_efektif_bund = vol_bruto - vol_pond_tank
+    vol_min = kapasitas_tank_besar * 1.0
+
+    # --- LOGIKA SAFETY DISTANCE SEDERHANA ---
+    est_kapasitas = estimate_cap(d_safety_1)
+    
+    # Ambil nilai langsung dari tabel (semua produk pakai tabel yg sama)
+    # dist_fac = Jarak ke Fasilitas (Besar)
+    # dist_road = Jarak ke Jalan (Kecil)
+    dist_fac, dist_road = get_nfpa_dist(est_kapasitas) 
+    
+    max_d_s = max(d_safety_1, d_safety_2)
+    shell_to_shell = (1/6)*(d_safety_1 + d_safety_2) if max_d_s <= 45 else (1/3)*(d_safety_1 + d_safety_2)
+    
+    # OUTPUT SESUAI PERMINTAAN
+    tank_to_road = dist_road # Shell to Building (Jalan - Nilai Kecil)
+    tank_to_prop = dist_fac  # Shell to Property (Fasilitas - Nilai Besar)
+
+    is_comply = vol_efektif_bund > kapasitas_tank_besar * 1 and tinggi_dinding <= 1.8
+    status_class = "status-comply" if is_comply else "status-noncomply"
+    status_text = "✓ COMPLY - AMAN" if is_comply else "✗ NON COMPLY"
+
+    st.markdown(f"### 📈 HASIL ANALISIS")
+    res1, res2, res3, res4 = st.columns(4)
+    res1.metric("Volume Bruto", f"{vol_bruto:.2f} m³")
+    res1.metric("Vol. Pond+Tank", f"{vol_pond_tank:.2f} m³")
+    res2.metric("Vol. Efektif Bund", f"{vol_efektif_bund:.2f} m³")
+    res2.metric("Volume Minimum", f"{vol_min:.2f} m³")
+    with res3:
+        st.write("Status Safety:")
+        st.markdown(f"<div class='{status_class}'>{status_text}</div>", unsafe_allow_html=True)
+    
+    if d_safety_1 > 0:
+        st.markdown("---")
+        st.write(f"**Safety Distance Minimum (NFPA 30 - {produk}):**")
+        sd_col1, sd_col2, sd_col3 = st.columns(3)
+        sd_col1.metric("Shell to Shell", f"{shell_to_shell:.2f} m")
+        sd_col2.metric("Shell to Building", f"{tank_to_road} m") # Merujuk ke Jalan (Nilai Kecil)
+        sd_col3.metric("Shell to Property", f"{tank_to_prop} m") # Merujuk ke Fasilitas (Nilai Besar)
+        
+        # Klasifikasi Teks
+        if produk in ["Pertalite", "Pertamax"]:
+            kelas_bbm = "Class I"
+        elif produk == "Solar":
+            kelas_bbm = "Class II"
+        else: # MFO, Avtur
+            kelas_bbm = "Class IIIA"
+            
+        caption_text = f"Estimasi Kapasitas: {est_kapasitas} KL. Klasifikasi: {kelas_bbm} (Tabel Utama NFPA 30)."
+        st.caption(caption_text)
+
+    # --- FITUR REKOMENDASI ---
+    if not is_comply:
+        st.markdown("<br>", unsafe_allow_html=True)
+        with st.expander("💡 LIHAT REKOMENDASI "):
+            st.markdown("### Rekomendasi Teknis HSSE")
+            kekurangan = vol_min - vol_efektif_bund
+            
+            rec_col1, rec_col2 = st.columns(2)
+            
+            with rec_col1:
+                st.info("**Opsi Rekayasa Fisik**")
+                luas_estimasi = vol_bruto / tinggi_dinding if tinggi_dinding > 0 else 1
+                tambah_h = kekurangan / luas_estimasi
+                target_h = tinggi_dinding + tambah_h
+                
+                if target_h <= 1.8:
+                    st.write(f"1. **Peninggian Dinding:** Target tinggi dinding baru adalah **{target_h:.2f} m** (Sesuai batas NFPA < 1.8m).")
+                else:
+                    st.write(f"1. **Perluasan Area:** Peninggian dinding hingga 1.8m tidak cukup. Diperlukan perluasan panjang/lebar area.")
+                
+                st.write("2. **Remote Impounding:** Integrasikan antar bundwall untuk atasi keterbatasan volume. Gunakan sistem Remote Impounding dengan saluran peluap ke kolam sekunder")
+
+            with rec_col2:
+                st.info("**Opsi Administratif & Operasional**")
+                aman_kl = vol_efektif_bund / 1.0
+                st.write(f"1. **Downgrading Kapasitas:** Batasi pengisian tangki terbesar maksimal hingga **{aman_kl:.2f} KL**.")
+                st.write("2. **Adjustment HLA:** Atur ulang sensor *High Level Alarm* (HLA) sesuai kapasitas bundwall saat ini.")
+                
+            st.warning("⚠️ Perubahan fisik wajib melalui kajian teknis sipil dan pemastian jarak aman (Safety Distance) tetap terjaga.")
