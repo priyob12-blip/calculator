@@ -1,5 +1,7 @@
 import streamlit as st
 import math
+from fpdf import FPDF
+from datetime import datetime
 
 # --- KONFIGURASI HALAMAN ---
 st.set_page_config(
@@ -46,6 +48,50 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
+# --- CLASS PDF GENERATOR ---
+class PDFReport(FPDF):
+    def header(self):
+        # Logo placeholder (optional)
+        # self.image('logo.png', 10, 8, 33)
+        self.set_font('Arial', 'B', 16)
+        self.set_text_color(0, 51, 102) # Dark Blue
+        self.cell(0, 10, 'BundSafe Tank Analytics Report', 0, 1, 'C')
+        
+        self.set_font('Arial', 'I', 10)
+        self.set_text_color(100, 100, 100) # Grey
+        self.cell(0, 10, f'Generated on: {datetime.now().strftime("%d %B %Y, %H:%M")}', 0, 1, 'C')
+        
+        self.set_draw_color(0, 51, 102)
+        self.set_line_width(0.5)
+        self.line(10, 30, 200, 30)
+        self.ln(10)
+
+    def footer(self):
+        self.set_y(-15)
+        self.set_font('Arial', 'I', 8)
+        self.set_text_color(128)
+        self.cell(0, 10, f'Page {self.page_no()}', 0, 0, 'C')
+
+    def chapter_title(self, label):
+        self.set_font('Arial', 'B', 12)
+        self.set_fill_color(230, 240, 255) # Light Blue
+        self.set_text_color(0, 0, 0)
+        self.cell(0, 10, f'  {label}', 0, 1, 'L', 1)
+        self.ln(4)
+
+    def chapter_body(self, text):
+        self.set_font('Arial', '', 10)
+        self.set_text_color(0, 0, 0)
+        self.multi_cell(0, 6, text)
+        self.ln()
+        
+    def add_metric_row(self, label, value):
+        self.set_font('Arial', '', 10)
+        self.cell(95, 8, label, 1)
+        self.set_font('Arial', 'B', 10)
+        self.cell(95, 8, value, 1)
+        self.ln()
+
 # --- FUNGSI PEMBANTU SAFETY DISTANCE ---
 def estimate_cap(dia):
     # Mapping Diameter ke Kapasitas sesuai Tabel 4
@@ -67,8 +113,7 @@ def estimate_cap(dia):
     else: return 50000
 
 def get_nfpa_dist(cap):
-    # Logika diperbaiki agar pas dengan range Tabel NFPA 30
-    # Mengembalikan nilai MUTLAK dari tabel NFPA (Tabel Kiri/Utama untuk semua Kelas I, II, IIIA)
+    # Logika TUNGGAL untuk Kelas I, II, dan IIIA (Pertalite, Pertamax, Solar, MFO)
     # dist_fac = Jarak ke Fasilitas/Bangunan (Kolom Tengah Tabel - Nilai Besar)
     # dist_road = Jarak ke Jalan Umum/Sisi Terdekat (Kolom Kanan Tabel - Nilai Kecil)
     
@@ -92,7 +137,11 @@ with col_reset:
     if st.button("🔄 RESET SYSTEM", use_container_width=True):
         st.rerun()
 
-d_atas_pond, d_bawah_pond, t_pondasis, d_tanks = [0.0]*5, [0.0]*5, [0.0]*5, [0.0]*5
+# Inisialisasi variabel untuk PDF
+d_atas_pond = [0.0]*5
+d_bawah_pond = [0.0]*5
+t_pondasis = [0.0]*5
+d_tanks = [0.0]*5
 
 if shape == "Trapesium":
     st.markdown("<div class='custom-card'><div class='section-title'>Bundwall Trapesium</div>", unsafe_allow_html=True)
@@ -181,12 +230,10 @@ if st.button("💾 HITUNG SEKARANG", type="primary", use_container_width=True):
     vol_efektif_bund = vol_bruto - vol_pond_tank
     vol_min = kapasitas_tank_besar * 1.0
 
-    # --- LOGIKA SAFETY DISTANCE SEDERHANA ---
+    # --- LOGIKA SAFETY DISTANCE SEDERHANA (SEMUA PRODUK SAMA) ---
     est_kapasitas = estimate_cap(d_safety_1)
     
     # Ambil nilai langsung dari tabel (semua produk pakai tabel yg sama)
-    # dist_fac = Jarak ke Fasilitas (Besar)
-    # dist_road = Jarak ke Jalan (Kecil)
     dist_fac, dist_road = get_nfpa_dist(est_kapasitas) 
     
     max_d_s = max(d_safety_1, d_safety_2)
@@ -198,7 +245,8 @@ if st.button("💾 HITUNG SEKARANG", type="primary", use_container_width=True):
 
     is_comply = vol_efektif_bund > kapasitas_tank_besar * 1 and tinggi_dinding <= 1.8
     status_class = "status-comply" if is_comply else "status-noncomply"
-    status_text = "✓ COMPLY - AMAN" if is_comply else "✗ NON COMPLY"
+    status_text = "COMPLY - AMAN" if is_comply else "NON COMPLY"
+    status_symbol = "✓" if is_comply else "✗"
 
     st.markdown(f"### 📈 HASIL ANALISIS")
     res1, res2, res3, res4 = st.columns(4)
@@ -208,8 +256,16 @@ if st.button("💾 HITUNG SEKARANG", type="primary", use_container_width=True):
     res2.metric("Volume Minimum", f"{vol_min:.2f} m³")
     with res3:
         st.write("Status Safety:")
-        st.markdown(f"<div class='{status_class}'>{status_text}</div>", unsafe_allow_html=True)
+        st.markdown(f"<div class='{status_class}'>{status_symbol} {status_text}</div>", unsafe_allow_html=True)
     
+    # Klasifikasi Teks
+    if produk in ["Pertalite", "Pertamax"]:
+        kelas_bbm = "Class I"
+    elif produk == "Solar":
+        kelas_bbm = "Class II"
+    else: # MFO, Avtur
+        kelas_bbm = "Class IIIA"
+
     if d_safety_1 > 0:
         st.markdown("---")
         st.write(f"**Safety Distance Minimum (NFPA 30 - {produk}):**")
@@ -218,18 +274,13 @@ if st.button("💾 HITUNG SEKARANG", type="primary", use_container_width=True):
         sd_col2.metric("Shell to Building", f"{tank_to_road} m") # Merujuk ke Jalan (Nilai Kecil)
         sd_col3.metric("Shell to Property", f"{tank_to_prop} m") # Merujuk ke Fasilitas (Nilai Besar)
         
-        # Klasifikasi Teks
-        if produk in ["Pertalite", "Pertamax"]:
-            kelas_bbm = "Class I"
-        elif produk == "Solar":
-            kelas_bbm = "Class II"
-        else: # MFO, Avtur
-            kelas_bbm = "Class IIIA"
-            
         caption_text = f"Estimasi Kapasitas: {est_kapasitas} KL. Klasifikasi: {kelas_bbm} (Tabel Utama NFPA 30)."
         st.caption(caption_text)
 
-    # --- FITUR REKOMENDASI ---
+    # --- REKOMENDASI ---
+    rec_text_fisik = []
+    rec_text_admin = []
+    
     if not is_comply:
         st.markdown("<br>", unsafe_allow_html=True)
         with st.expander("💡 LIHAT REKOMENDASI "):
@@ -245,16 +296,105 @@ if st.button("💾 HITUNG SEKARANG", type="primary", use_container_width=True):
                 target_h = tinggi_dinding + tambah_h
                 
                 if target_h <= 1.8:
-                    st.write(f"1. **Peninggian Dinding:** Target tinggi dinding baru adalah **{target_h:.2f} m** (Sesuai batas NFPA < 1.8m).")
+                    msg_1 = f"1. **Peninggian Dinding:** Target tinggi dinding baru adalah **{target_h:.2f} m** (Sesuai batas NFPA < 1.8m)."
+                    st.write(msg_1)
+                    rec_text_fisik.append(msg_1.replace("**",""))
                 else:
-                    st.write(f"1. **Perluasan Area:** Peninggian dinding hingga 1.8m tidak cukup. Diperlukan perluasan panjang/lebar area.")
+                    msg_1 = f"1. **Perluasan Area:** Peninggian dinding hingga 1.8m tidak cukup. Diperlukan perluasan panjang/lebar area."
+                    st.write(msg_1)
+                    rec_text_fisik.append(msg_1.replace("**",""))
                 
-                st.write("2. **Remote Impounding:** Integrasikan antar bundwall untuk atasi keterbatasan volume. Gunakan sistem Remote Impounding dengan saluran peluap ke kolam sekunder")
+                msg_2 = "2. **Remote Impounding:** Integrasikan antar bundwall untuk atasi keterbatasan volume. Gunakan sistem Remote Impounding dengan saluran peluap ke kolam sekunder"
+                st.write(msg_2)
+                rec_text_fisik.append(msg_2.replace("**",""))
 
             with rec_col2:
                 st.info("**Opsi Administratif & Operasional**")
                 aman_kl = vol_efektif_bund / 1.0
-                st.write(f"1. **Downgrading Kapasitas:** Batasi pengisian tangki terbesar maksimal hingga **{aman_kl:.2f} KL**.")
-                st.write("2. **Adjustment HLA:** Atur ulang sensor *High Level Alarm* (HLA) sesuai kapasitas bundwall saat ini.")
+                msg_3 = f"1. **Downgrading Kapasitas:** Batasi pengisian tangki terbesar maksimal hingga **{aman_kl:.2f} KL**."
+                st.write(msg_3)
+                rec_text_admin.append(msg_3.replace("**",""))
+                
+                msg_4 = "2. **Adjustment HLA:** Atur ulang sensor *High Level Alarm* (HLA) sesuai kapasitas bundwall saat ini."
+                st.write(msg_4)
+                rec_text_admin.append(msg_4.replace("**","").replace("*",""))
                 
             st.warning("⚠️ Perubahan fisik wajib melalui kajian teknis sipil dan pemastian jarak aman (Safety Distance) tetap terjaga.")
+
+    # --- GENERATE PDF REPORT ---
+    pdf = PDFReport()
+    pdf.add_page()
+    
+    # 1. Info Umum
+    pdf.chapter_title('1. Data Operasional')
+    dimensi_str = f"Panjang: {panjang_luar}m, Lebar: {lebar_luar}m, Tinggi: {tinggi_dinding}m" if shape == 'Trapesium' else f"Panjang: {panjang}m, Lebar: {lebar}m, Tinggi: {tinggi_dinding}m"
+    pdf.chapter_body(f"""
+    Jenis Bundwall      : {shape}
+    Produk Disimpan     : {produk} ({kelas_bbm})
+    Kapasitas Tank Max  : {kapasitas_tank_besar} KL
+    Dimensi Bundwall    : {dimensi_str}
+    """)
+    
+    # 2. Hasil Perhitungan
+    pdf.chapter_title('2. Hasil Analisis Kapasitas')
+    pdf.set_fill_color(255, 255, 255)
+    pdf.add_metric_row('Volume Bruto', f'{vol_bruto:.2f} m3')
+    pdf.add_metric_row('Volume Pondasi + Tank', f'{vol_pond_tank:.2f} m3')
+    pdf.add_metric_row('Volume Efektif', f'{vol_efektif_bund:.2f} m3')
+    pdf.add_metric_row('Volume Minimum (Req)', f'{vol_min:.2f} m3')
+    
+    # Status
+    pdf.ln(2)
+    pdf.set_font('Arial', 'B', 12)
+    pdf.cell(30, 10, 'STATUS:', 0, 0)
+    if is_comply:
+        pdf.set_text_color(0, 150, 0) # Green
+        pdf.cell(0, 10, 'COMPLY (AMAN)', 0, 1)
+    else:
+        pdf.set_text_color(200, 0, 0) # Red
+        pdf.cell(0, 10, 'NON COMPLY (TIDAK AMAN)', 0, 1)
+    pdf.set_text_color(0, 0, 0) # Reset color
+    pdf.ln(5)
+
+    # 3. Safety Distance
+    pdf.chapter_title('3. Analisis Safety Distance (NFPA 30)')
+    pdf.add_metric_row('Klasifikasi BBM', f'{kelas_bbm}')
+    pdf.add_metric_row('Est. Kapasitas (Ref)', f'{est_kapasitas} KL')
+    pdf.add_metric_row('Shell to Shell', f'{shell_to_shell:.2f} m')
+    pdf.add_metric_row('Shell to Building', f'{tank_to_road} m')
+    pdf.add_metric_row('Shell to Property', f'{tank_to_prop} m')
+    pdf.ln(5)
+
+    # 4. Rekomendasi (Jika Ada)
+    if not is_comply:
+        pdf.chapter_title('4. Rekomendasi Perbaikan')
+        
+        if rec_text_fisik:
+            pdf.set_font('Arial', 'B', 10)
+            pdf.cell(0, 8, 'Opsi Rekayasa Fisik:', 0, 1)
+            pdf.set_font('Arial', '', 10)
+            for item in rec_text_fisik:
+                pdf.multi_cell(0, 6, f"- {item}")
+            pdf.ln(2)
+            
+        if rec_text_admin:
+            pdf.set_font('Arial', 'B', 10)
+            pdf.cell(0, 8, 'Opsi Administratif:', 0, 1)
+            pdf.set_font('Arial', '', 10)
+            for item in rec_text_admin:
+                pdf.multi_cell(0, 6, f"- {item}")
+        
+        pdf.ln(5)
+        pdf.set_font('Arial', 'I', 9)
+        pdf.set_text_color(100, 0, 0)
+        pdf.multi_cell(0, 5, "Catatan: Perubahan fisik wajib melalui kajian teknis sipil dan pemastian jarak aman (Safety Distance) tetap terjaga.")
+
+    # Output Button
+    pdf_bytes = pdf.output(dest='S').encode('latin-1')
+    st.download_button(
+        label="📄 DOWNLOAD LAPORAN PDF",
+        data=pdf_bytes,
+        file_name=f"Laporan_BundSafe_{datetime.now().strftime('%Y%m%d_%H%M')}.pdf",
+        mime='application/pdf',
+        use_container_width=True
+    )
