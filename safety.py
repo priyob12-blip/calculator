@@ -48,149 +48,15 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# --- CLASS PDF GENERATOR (KOMPAK & 1 HALAMAN) ---
+# --- CLASS PDF GENERATOR (VERSI COMPACT 1 HALAMAN) ---
 class PDFReport(FPDF):
     def header(self):
         self.set_font('Arial', 'B', 14)
         self.cell(0, 8, 'Laporan Analisis Bundwall (BundSafe)', 0, 1, 'C')
         self.set_font('Arial', '', 9)
-        # HANYA TANGGAL, TANPA JAM
+        # HANYA TANGGAL
         self.cell(0, 5, f'Tanggal Cetak: {datetime.now().strftime("%d %B %Y")}', 0, 1, 'C')
         self.line(10, 25, 200, 25)
         self.ln(5)
 
     def chapter_title(self, label):
-        self.set_font('Arial', 'B', 10)
-        self.set_fill_color(240, 240, 240)
-        self.cell(0, 6, f'{label}', 0, 1, 'L', 1)
-        self.ln(1)
-
-    def add_row_compact(self, label, value):
-        self.set_font('Arial', '', 9)
-        self.cell(70, 5, label, 0)
-        self.set_font('Arial', 'B', 9)
-        self.cell(0, 5, f": {value}", 0, 1)
-
-# --- FUNGSI PEMBANTU SAFETY DISTANCE ---
-def estimate_cap(dia):
-    # Mapping Diameter ke Kapasitas sesuai Tabel 4
-    if dia <= 6.68: return 150
-    elif dia <= 7.64: return 200
-    elif dia <= 8.59: return 250
-    elif dia <= 9.55: return 500
-    elif dia <= 11.46: return 700
-    elif dia <= 13.37: return 1500
-    elif dia <= 15.28: return 2000
-    elif dia <= 17.19: return 2500
-    elif dia <= 19.10: return 5000
-    elif dia <= 27.69: return 10000
-    elif dia <= 30.56: return 12500
-    elif dia <= 33.42: return 15000
-    elif dia <= 40.11: return 20000
-    elif dia <= 43.93: return 25000
-    elif dia <= 48.70: return 30000
-    else: return 50000
-
-def get_nfpa_dist(cap):
-    # Logika TUNGGAL untuk Kelas I, II, dan IIIA (Pertalite, Pertamax, Solar, MFO)
-    if cap <= 1.045: return 1.5, 1.5
-    elif cap <= 2.85: return 3.0, 1.5
-    elif cap <= 45.6: return 4.5, 1.5
-    elif cap <= 114.0: return 6.0, 1.5
-    elif cap <= 190.0: return 9.0, 3.0
-    elif cap <= 380.0: return 15.0, 4.5
-    elif cap <= 1900.0: return 24.0, 7.5
-    elif cap <= 3800.0: return 30.0, 10.5
-    elif cap <= 7600.0: return 40.5, 13.5
-    elif cap <= 11400.0: return 49.5, 16.5
-    else: return 52.5, 18.0
-
-# --- BAGIAN INPUT UTAMA ---
-col_shape, col_reset = st.columns([4, 1])
-with col_shape:
-    shape = st.selectbox("Pilih Jenis Bundwall:", ["Trapesium", "Persegi"], key="shape_select")
-with col_reset:
-    if st.button("🔄 RESET SYSTEM", use_container_width=True):
-        st.rerun()
-
-d_atas_pond, d_bawah_pond, t_pondasis, d_tanks = [0.0]*5, [0.0]*5, [0.0]*5, [0.0]*5
-
-if shape == "Trapesium":
-    st.markdown("<div class='custom-card'><div class='section-title'>Bundwall Trapesium</div>", unsafe_allow_html=True)
-    col1, col2, col3 = st.columns(3)
-    panjang_luar = col1.number_input("Panjang Luar (m)", min_value=0.0, key="p_luar")
-    lebar_luar = col2.number_input("Lebar Luar (m)", min_value=0.0, key="l_luar")
-    tinggi_dinding = col3.number_input("Tinggi Dinding (m)", min_value=0.0, key="t_dinding")
-    st.markdown("</div>", unsafe_allow_html=True)
-    
-    st.markdown("<div class='custom-card'><div class='section-title'>Dimensi Dinding</div>", unsafe_allow_html=True)
-    col4, col5, col6 = st.columns(3)
-    lebar_atas = col4.number_input("Lebar Atas (m)", min_value=0.0, key="lebar_atas")
-    lebar_bawah = col5.number_input("Lebar Bawah (m)", min_value=0.0, key="lebar_bawah")
-    kapasitas_tank_besar = col6.number_input("Kapasitas Tangki Terbesar (KL)", min_value=0.0, key="kapasitas")
-    st.markdown("</div>", unsafe_allow_html=True)
-
-    st.markdown("<div class='custom-card'><div class='section-title'>Data Tangki & Pondasi (5 Unit)</div>", unsafe_allow_html=True)
-    for i in range(5):
-        with st.expander(f"Tangki {i+1}"):
-            ct1, ct2, ct3, ct4 = st.columns(4)
-            d_atas_pond[i] = ct1.number_input(f"D. Atas Pondasi {i+1}", min_value=0.0, key=f"d_at_tr_{i}")
-            d_bawah_pond[i] = ct2.number_input(f"D. Bawah Pondasi {i+1}", min_value=0.0, key=f"d_bw_tr_{i}")
-            t_pondasis[i] = ct3.number_input(f"Tinggi Pondasi {i+1}", min_value=0.0, key=f"t_pd_tr_{i}")
-            d_tanks[i] = ct4.number_input(f"Diameter Tangki {i+1}", min_value=0.0, key=f"d_tk_tr_{i}")
-    st.markdown("</div>", unsafe_allow_html=True)
-
-    st.markdown("<div class='custom-card'><div class='section-title'>Safety Distance</div>", unsafe_allow_html=True)
-    cs1, cs2, cs3 = st.columns(3)
-    produk = cs1.selectbox("Jenis BBM:", ["Pertalite", "Pertamax", "Solar", "Avtur", "MFO"], key="prod_tr")
-    d_safety_1 = cs2.number_input("D. Tangki 1 (m)", min_value=0.0, key="sd_d1_tr")
-    d_safety_2 = cs3.number_input("D. Tangki 2 (m)", min_value=0.0, key="sd_d2_tr")
-    st.markdown("</div>", unsafe_allow_html=True)
-
-else:  # Persegi
-    st.markdown("<div class='custom-card'><div class='section-title'>Bundwall Persegi</div>", unsafe_allow_html=True)
-    col1, col2, col3 = st.columns(3)
-    panjang = col1.number_input("Panjang (m)", min_value=0.0, key="p_per")
-    lebar = col2.number_input("Lebar (m)", min_value=0.0, key="l_per")
-    tinggi_dinding = col3.number_input("Tinggi Dinding (m)", min_value=0.0, key="t_per")
-    st.markdown("</div>", unsafe_allow_html=True)
-
-    st.markdown("<div class='custom-card'><div class='section-title'>Dimensi Dinding</div>", unsafe_allow_html=True)
-    col4, col5, col6 = st.columns(3)
-    lebar_dinding = col4.number_input("Lebar Dinding (m)", min_value=0.0, key="ld1_per")
-    panjang_tebal_dinding = col5.number_input("Ketebalan Dinding (m)", min_value=0.0, key="ld2_per")
-    kapasitas_tank_besar = col6.number_input("Kapasitas Tangki Terbesar (KL)", min_value=0.0, key="kap_per")
-    st.markdown("</div>", unsafe_allow_html=True)
-
-    st.markdown("<div class='custom-card'><div class='section-title'>Data Tangki & Pondasi (5 Unit)</div>", unsafe_allow_html=True)
-    for i in range(5):
-        with st.expander(f"Tangki {i+1}"):
-            cp1, cp2, cp3, cp4 = st.columns(4)
-            d_atas_pond[i] = cp1.number_input(f"D. Atas Pondasi {i+1}", min_value=0.0, key=f"d_at_pr_{i}")
-            d_bawah_pond[i] = cp2.number_input(f"D. Bawah Pondasi {i+1}", min_value=0.0, key=f"d_bw_pr_{i}")
-            t_pondasis[i] = cp3.number_input(f"Tinggi Pondasi {i+1}", min_value=0.0, key=f"t_pd_pr_{i}")
-            d_tanks[i] = cp4.number_input(f"Diameter Tangki {i+1}", min_value=0.0, key=f"d_tk_pr_{i}")
-    st.markdown("</div>", unsafe_allow_html=True)
-
-    st.markdown("<div class='custom-card'><div class='section-title'>Safety Distance</div>", unsafe_allow_html=True)
-    cs1, cs2, cs3 = st.columns(3)
-    produk = cs1.selectbox("Jenis BBM:", ["Pertalite", "Pertamax", "Solar", "Avtur", "MFO"], key="prod_per")
-    d_safety_1 = cs2.number_input("D. Tangki 1 (m)", min_value=0.0, key="sd_d1_pr")
-    d_safety_2 = cs3.number_input("D. Tangki 2 (m)", min_value=0.0, key="sd_d2_pr")
-    st.markdown("</div>", unsafe_allow_html=True)
-
-# --- LOGIKA PERHITUNGAN & OUTPUT ---
-if st.button("💾 HITUNG SEKARANG", type="primary", use_container_width=True):
-    # --- RUMUS ASLI (KOMPLEKS) UNTUK VOLUME BRUTO ---
-    if shape == "Trapesium":
-        t1_a = (panjang_luar - (2 * lebar_bawah))
-        t1_b = (panjang_luar - ((lebar_atas + ((lebar_bawah - lebar_atas) / 2)) * 2))
-        term1 = ((t1_a + t1_b) / 2 * tinggi_dinding) * (lebar_luar - (2 * lebar_bawah))
-        s_val = (lebar_bawah - lebar_atas) / 2
-        term2 = ((lebar_bawah * s_val) / 2) * (panjang_luar - (s_val + lebar_bawah)) * 2
-        vol_bruto = term1 + term2
-    else:
-        vol_bruto = tinggi_dinding * (panjang - 2*lebar_dinding) * (lebar - 2*panjang_tebal_dinding)
-
-    vol_pond_tank = 0
-    for i in range(5
