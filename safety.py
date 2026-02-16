@@ -218,10 +218,10 @@ if st.button("💾 HITUNG SEKARANG", type="primary", use_container_width=True):
         sd_col2.metric("Shell to Building", f"{tank_to_road} m") # Merujuk ke Jalan (Nilai Kecil)
         sd_col3.metric("Shell to Property", f"{tank_to_prop} m") # Merujuk ke Fasilitas (Nilai Besar)
         
-        # Klasifikasi Teks
+        # Klasifikasi Teks - DIEDIT BAGIAN INI SESUAI REQUEST
         if produk in ["Pertalite", "Pertamax"]:
             kelas_bbm = "Class I"
-        elif produk == ["Solar", "Avtur"] :
+        elif produk in ["Solar", "Avtur"]: # Avtur pindah ke Class II bersama Solar
             kelas_bbm = "Class II"
         else: # MFO
             kelas_bbm = "Class IIIA"
