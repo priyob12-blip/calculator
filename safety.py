@@ -1,13 +1,6 @@
 import streamlit as st
 import math
 
-# --- KONFIGURASI HALAMAN ---
-st.set_page_config(
-    page_title="BundSafe Tank Analytics", 
-    page_icon="⚡", 
-    layout="wide"
-)
-
 # Konfigurasi Halaman agar tampil penuh (wide)
 st.set_page_config(page_title="BundSafe Tank Analytics", layout="wide")
 
