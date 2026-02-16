@@ -142,7 +142,7 @@ else:  # Persegi
     st.markdown("<div class='custom-card'><div class='section-title'>Dimensi Dinding</div>", unsafe_allow_html=True)
     col4, col5, col6 = st.columns(3)
     lebar_dinding = col4.number_input("Lebar Dinding (m)", min_value=0.0, key="ld1_per")
-    panjang_tebal_dinding = col5.number_input("Ketebalan Dinding (m)", min_value=0.0, key="ld2_per")
+    panjang_tebal_dinding = col5.number_input("Panjang Dinding (m)", min_value=0.0, key="ld2_per")
     kapasitas_tank_besar = col6.number_input("Kapasitas Tangki Terbesar (KL)", min_value=0.0, key="kap_per")
     st.markdown("</div>", unsafe_allow_html=True)
 
