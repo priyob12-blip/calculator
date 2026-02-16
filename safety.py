@@ -221,9 +221,9 @@ if st.button("💾 HITUNG SEKARANG", type="primary", use_container_width=True):
         # Klasifikasi Teks
         if produk in ["Pertalite", "Pertamax"]:
             kelas_bbm = "Class I"
-        elif produk == "Solar":
+        elif produk == ["Solar", "Avtur"] :
             kelas_bbm = "Class II"
-        else: # MFO, Avtur
+        else: # MFO
             kelas_bbm = "Class IIIA"
             
         caption_text = f"Estimasi Kapasitas: {est_kapasitas} KL. Klasifikasi: {kelas_bbm} (Tabel Utama NFPA 30)."
