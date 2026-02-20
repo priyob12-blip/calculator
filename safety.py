@@ -119,6 +119,13 @@ if shape == "Trapesium":
             d_tanks[i] = ct4.number_input(f"Diameter Tangki {i+1}", min_value=0.0, key=f"d_tk_tr_{i}")
     st.markdown("</div>", unsafe_allow_html=True)
 
+    # TAMBAHAN BAGIAN SISTEM CONTAINMENT
+    st.markdown("<div class='custom-card'><div class='section-title'>Sistem Containment</div>", unsafe_allow_html=True)
+    cont1, cont2 = st.columns(2)
+    containment_type = cont1.selectbox("Metode Containment:", ["Open Diking", "Remote Impounding"], key="cont_tr")
+    tipe_atap = cont2.selectbox("Tipe Atap Tangki:", ["Fixed atau Horizontal", "Floating Roof"], key="atap_tr")
+    st.markdown("</div>", unsafe_allow_html=True)
+
     st.markdown("<div class='custom-card'><div class='section-title'>Safety Distance</div>", unsafe_allow_html=True)
     cs1, cs2, cs3 = st.columns(3)
     produk = cs1.selectbox("Jenis BBM:", ["Pertalite", "Pertamax", "Solar", "Avtur", "MFO"], key="prod_tr")
@@ -149,6 +156,13 @@ else:  # Persegi
             d_bawah_pond[i] = cp2.number_input(f"D. Bawah Pondasi {i+1}", min_value=0.0, key=f"d_bw_pr_{i}")
             t_pondasis[i] = cp3.number_input(f"Tinggi Pondasi {i+1}", min_value=0.0, key=f"t_pd_pr_{i}")
             d_tanks[i] = cp4.number_input(f"Diameter Tangki {i+1}", min_value=0.0, key=f"d_tk_pr_{i}")
+    st.markdown("</div>", unsafe_allow_html=True)
+
+    # TAMBAHAN BAGIAN SISTEM CONTAINMENT
+    st.markdown("<div class='custom-card'><div class='section-title'>Sistem Containment</div>", unsafe_allow_html=True)
+    cont1, cont2 = st.columns(2)
+    containment_type = cont1.selectbox("Metode Containment:", ["Open Diking", "Remote Impounding"], key="cont_per")
+    tipe_atap = cont2.selectbox("Tipe Atap Tangki:", ["Fixed atau Horizontal", "Floating Roof"], key="atap_per")
     st.markdown("</div>", unsafe_allow_html=True)
 
     st.markdown("<div class='custom-card'><div class='section-title'>Safety Distance</div>", unsafe_allow_html=True)
@@ -189,8 +203,37 @@ if st.button("💾 HITUNG SEKARANG", type="primary", use_container_width=True):
     # dist_road = Jarak ke Jalan (Kecil)
     dist_fac, dist_road = get_nfpa_dist(est_kapasitas) 
     
+    # Menentukan klasifikasi cairan untuk logika tabel
+    if produk in ["Pertalite", "Pertamax"]:
+        kelas_bbm_calc = "Class I"
+    elif produk in ["Solar", "Avtur"]:
+        kelas_bbm_calc = "Class II"
+    else:
+        kelas_bbm_calc = "Class IIIA"
+
     max_d_s = max(d_safety_1, d_safety_2)
-    shell_to_shell = (1/6)*(d_safety_1 + d_safety_2) if max_d_s <= 45 else (1/3)*(d_safety_1 + d_safety_2)
+    sum_d_s = d_safety_1 + d_safety_2
+    
+    # PERUBAHAN LOGIKA SESUAI GAMBAR TABEL
+    if max_d_s <= 45:
+        shell_to_shell = (1/6) * sum_d_s
+    else:
+        if containment_type == "Remote Impounding":
+            if tipe_atap == "Floating Roof":
+                shell_to_shell = (1/6) * sum_d_s
+            else: # Fixed atau Horizontal
+                if kelas_bbm_calc in ["Class I", "Class II"]:
+                    shell_to_shell = (1/4) * sum_d_s
+                else: # Class IIIA
+                    shell_to_shell = (1/6) * sum_d_s
+        else: # Open Diking
+            if tipe_atap == "Floating Roof":
+                shell_to_shell = (1/4) * sum_d_s
+            else: # Fixed atau Horizontal
+                if kelas_bbm_calc in ["Class I", "Class II"]:
+                    shell_to_shell = (1/3) * sum_d_s
+                else: # Class IIIA
+                    shell_to_shell = (1/4) * sum_d_s
     
     # OUTPUT SESUAI PERMINTAAN
     tank_to_road = dist_road # Shell to Building (Jalan - Nilai Kecil)
