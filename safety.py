@@ -221,7 +221,7 @@ if st.button("💾 HITUNG SEKARANG", type="primary", use_container_width=True):
         if containment_type == "Remote Impounding":
             if tipe_atap == "Floating Roof":
                 shell_to_shell = (1/6) * sum_d_s
-            else: # Fixed atau Horizontal
+            else: # Fixed Roof
                 if kelas_bbm_calc in ["Class I", "Class II"]:
                     shell_to_shell = (1/4) * sum_d_s
                 else: # Class IIIA
@@ -229,7 +229,7 @@ if st.button("💾 HITUNG SEKARANG", type="primary", use_container_width=True):
         else: # Open Diking
             if tipe_atap == "Floating Roof":
                 shell_to_shell = (1/4) * sum_d_s
-            else: # Fixed atau Horizontal
+            else: # Fixed Roof
                 if kelas_bbm_calc in ["Class I", "Class II"]:
                     shell_to_shell = (1/3) * sum_d_s
                 else: # Class IIIA
