@@ -1,5 +1,8 @@
 import streamlit as st
 import math
+import tempfile
+import os
+from fpdf import FPDF
 
 # --- KONFIGURASI HALAMAN ---
 st.set_page_config(
@@ -48,7 +51,6 @@ st.markdown("""
 
 # --- FUNGSI PEMBANTU SAFETY DISTANCE ---
 def estimate_cap(dia):
-    # Mapping Diameter ke Kapasitas sesuai Tabel 4
     if dia <= 6.68: return 150
     elif dia <= 7.64: return 200
     elif dia <= 8.59: return 250
@@ -67,11 +69,6 @@ def estimate_cap(dia):
     else: return 50000
 
 def get_nfpa_dist(cap):
-    # Logika diperbaiki agar pas dengan range Tabel NFPA 30
-    # Mengembalikan nilai MUTLAK dari tabel NFPA (Tabel Kiri/Utama untuk semua Kelas I, II, IIIA)
-    # dist_fac = Jarak ke Fasilitas/Bangunan (Kolom Tengah Tabel - Nilai Besar)
-    # dist_road = Jarak ke Jalan Umum/Sisi Terdekat (Kolom Kanan Tabel - Nilai Kecil)
-    
     if cap <= 1.045: return 1.5, 1.5
     elif cap <= 2.85: return 3.0, 1.5
     elif cap <= 45.6: return 4.5, 1.5
@@ -301,3 +298,48 @@ if st.button("💾 HITUNG SEKARANG", type="primary", use_container_width=True):
                 st.write("2. **Adjustment HLA:** Atur ulang sensor *High Level Alarm* (HLA) sesuai kapasitas bundwall saat ini.")
                 
             st.warning("⚠️ Perubahan fisik wajib melalui kajian teknis sipil dan pemastian jarak aman (Safety Distance) tetap terjaga.")
+
+    # --- FITUR EXPORT PDF (1 LEMBAR) ---
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font("Arial", 'B', 16)
+    pdf.cell(0, 10, "Laporan Analisis BundSafe - NFPA 30", ln=True, align="C")
+    pdf.set_font("Arial", '', 12)
+    pdf.cell(0, 10, "-"*65, ln=True, align="C")
+    
+    # Membersihkan karakter centang/silang agar PDF tidak error format
+    safe_status = status_text.replace('✓', '').replace('✗', '').strip()
+    
+    pdf.set_font("Arial", 'B', 12)
+    pdf.cell(0, 10, f"Status: {safe_status}", ln=True)
+    pdf.set_font("Arial", '', 12)
+    pdf.cell(0, 10, f"Volume Bruto: {vol_bruto:.2f} m3", ln=True)
+    pdf.cell(0, 10, f"Vol. Pondasi+Tangki: {vol_pond_tank:.2f} m3", ln=True)
+    pdf.cell(0, 10, f"Vol. Efektif Bundwall: {vol_efektif_bund:.2f} m3", ln=True)
+    pdf.cell(0, 10, f"Volume Minimum (Syarat): {vol_min:.2f} m3", ln=True)
+    
+    if d_safety_1 > 0:
+        pdf.cell(0, 10, "", ln=True) # Spasi kosong
+        pdf.set_font("Arial", 'B', 12)
+        pdf.cell(0, 10, f"Safety Distance Minimum (NFPA 30 - {produk}):", ln=True)
+        pdf.set_font("Arial", '', 12)
+        pdf.cell(0, 10, f"- Klasifikasi Cairan: {kelas_bbm}", ln=True)
+        pdf.cell(0, 10, f"- Shell to Shell: {shell_to_shell:.2f} m", ln=True)
+        pdf.cell(0, 10, f"- Shell to Building (Jalan): {tank_to_road} m", ln=True)
+        pdf.cell(0, 10, f"- Shell to Property (Fasilitas): {tank_to_prop} m", ln=True)
+
+    # Simpan ke memori sementara untuk didownload Streamlit
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
+        pdf.output(tmp.name)
+        with open(tmp.name, "rb") as f:
+            pdf_bytes = f.read()
+    os.remove(tmp.name)
+    
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.download_button(
+        label="📥 EXPORT TO PDF (1 Lembar)",
+        data=pdf_bytes,
+        file_name="Laporan_BundSafe.pdf",
+        mime="application/pdf",
+        use_container_width=True
+    )
