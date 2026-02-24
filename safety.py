@@ -121,7 +121,9 @@ if shape == "Trapesium":
 
     # TAMBAHAN BAGIAN SISTEM CONTAINMENT
     st.markdown("<div class='custom-card'><div class='section-title'>Sistem Containment</div>", unsafe_allow_html=True)
-    containment_type = st.selectbox("Metode Containment:", ["Open Diking", "Remote Impounding"], key="cont_tr")
+    cont1, cont2 = st.columns(2)
+    containment_type = cont1.selectbox("Metode Containment:", ["Open Diking", "Remote Impounding"], key="cont_tr")
+    tipe_atap = cont2.selectbox("Tipe Atap Tangki:", ["Fixed atau Horizontal", "Floating Roof"], key="atap_tr")
     st.markdown("</div>", unsafe_allow_html=True)
 
     st.markdown("<div class='custom-card'><div class='section-title'>Safety Distance</div>", unsafe_allow_html=True)
@@ -158,7 +160,9 @@ else:  # Persegi
 
     # TAMBAHAN BAGIAN SISTEM CONTAINMENT
     st.markdown("<div class='custom-card'><div class='section-title'>Sistem Containment</div>", unsafe_allow_html=True)
-    containment_type = st.selectbox("Metode Containment:", ["Open Diking", "Remote Impounding"], key="cont_per")
+    cont1, cont2 = st.columns(2)
+    containment_type = cont1.selectbox("Metode Containment:", ["Open Diking", "Remote Impounding"], key="cont_per")
+    tipe_atap = cont2.selectbox("Tipe Atap Tangki:", ["Fixed atau Horizontal", "Floating Roof"], key="atap_per")
     st.markdown("</div>", unsafe_allow_html=True)
 
     st.markdown("<div class='custom-card'><div class='section-title'>Safety Distance</div>", unsafe_allow_html=True)
@@ -210,20 +214,26 @@ if st.button("💾 HITUNG SEKARANG", type="primary", use_container_width=True):
     max_d_s = max(d_safety_1, d_safety_2)
     sum_d_s = d_safety_1 + d_safety_2
     
-    # PERUBAHAN LOGIKA SESUAI GAMBAR TABEL (Fokus Tangki Fix/Horizontal)
+    # PERUBAHAN LOGIKA SESUAI GAMBAR TABEL
     if max_d_s <= 45:
         shell_to_shell = (1/6) * sum_d_s
     else:
         if containment_type == "Remote Impounding":
-            if kelas_bbm_calc in ["Class I", "Class II"]:
-                shell_to_shell = (1/4) * sum_d_s
-            else: # Class IIIA
+            if tipe_atap == "Floating Roof":
                 shell_to_shell = (1/6) * sum_d_s
+            else: # Fixed atau Horizontal
+                if kelas_bbm_calc in ["Class I", "Class II"]:
+                    shell_to_shell = (1/4) * sum_d_s
+                else: # Class IIIA
+                    shell_to_shell = (1/6) * sum_d_s
         else: # Open Diking
-            if kelas_bbm_calc in ["Class I", "Class II"]:
-                shell_to_shell = (1/3) * sum_d_s
-            else: # Class IIIA
+            if tipe_atap == "Floating Roof":
                 shell_to_shell = (1/4) * sum_d_s
+            else: # Fixed atau Horizontal
+                if kelas_bbm_calc in ["Class I", "Class II"]:
+                    shell_to_shell = (1/3) * sum_d_s
+                else: # Class IIIA
+                    shell_to_shell = (1/4) * sum_d_s
     
     # OUTPUT SESUAI PERMINTAAN
     tank_to_road = dist_road # Shell to Building (Jalan - Nilai Kecil)
