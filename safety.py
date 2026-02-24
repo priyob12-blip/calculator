@@ -123,7 +123,7 @@ if shape == "Trapesium":
     st.markdown("<div class='custom-card'><div class='section-title'>Sistem Containment</div>", unsafe_allow_html=True)
     cont1, cont2 = st.columns(2)
     containment_type = cont1.selectbox("Metode Containment:", ["Open Diking", "Remote Impounding"], key="cont_tr")
-    tipe_atap = cont2.selectbox("Tipe Atap Tangki:", ["Fixed atau Horizontal", "Floating Roof"], key="atap_tr")
+    tipe_atap = cont2.selectbox("Tipe Atap Tangki:", ["Fixed Roof", "Floating Roof"], key="atap_tr")
     st.markdown("</div>", unsafe_allow_html=True)
 
     st.markdown("<div class='custom-card'><div class='section-title'>Safety Distance</div>", unsafe_allow_html=True)
