@@ -4,7 +4,7 @@ import math
 # --- KONFIGURASI HALAMAN ---
 st.set_page_config(
     page_title="BundSafe Tank Analytics", 
-    page_icon="⚡", 
+    page_icon="📱", 
     layout="wide"
 )
 
@@ -48,9 +48,40 @@ st.markdown("""
 
 # --- FUNGSI PEMBANTU SAFETY DISTANCE ---
 def estimate_cap(dia):
+    # Mapping Diameter ke Kapasitas sesuai Tabel 4
+    if dia <= 6.68: return 150
+    elif dia <= 7.64: return 200
+    elif dia <= 8.59: return 250
+    elif dia <= 9.55: return 500
+    elif dia <= 11.46: return 700
+    elif dia <= 13.37: return 1500
+    elif dia <= 15.28: return 2000
+    elif dia <= 17.19: return 2500
+    elif dia <= 19.10: return 5000
+    elif dia <= 27.69: return 10000
+    elif dia <= 30.56: return 12500
+    elif dia <= 33.42: return 15000
+    elif dia <= 40.11: return 20000
+    elif dia <= 43.93: return 25000
+    elif dia <= 48.70: return 30000
     else: return 50000
 
 def get_nfpa_dist(cap):
+    # Logika diperbaiki agar pas dengan range Tabel NFPA 30
+    # Mengembalikan nilai MUTLAK dari tabel NFPA (Tabel Kiri/Utama untuk semua Kelas I, II, IIIA)
+    # dist_fac = Jarak ke Fasilitas/Bangunan (Kolom Tengah Tabel - Nilai Besar)
+    # dist_road = Jarak ke Jalan Umum/Sisi Terdekat (Kolom Kanan Tabel - Nilai Kecil)
+    
+    if cap <= 1.045: return 1.5, 1.5
+    elif cap <= 2.85: return 3.0, 1.5
+    elif cap <= 45.6: return 4.5, 1.5
+    elif cap <= 114.0: return 6.0, 1.5
+    elif cap <= 190.0: return 9.0, 3.0
+    elif cap <= 380.0: return 15.0, 4.5
+    elif cap <= 1900.0: return 24.0, 7.5
+    elif cap <= 3800.0: return 30.0, 10.5
+    elif cap <= 7600.0: return 40.5, 13.5
+    elif cap <= 11400.0: return 49.5, 16.5
     else: return 52.5, 18.0
 
 # --- BAGIAN INPUT UTAMA ---
@@ -90,9 +121,7 @@ if shape == "Trapesium":
 
     # TAMBAHAN BAGIAN SISTEM CONTAINMENT
     st.markdown("<div class='custom-card'><div class='section-title'>Sistem Containment</div>", unsafe_allow_html=True)
-    cont1, cont2 = st.columns(2)
-    containment_type = cont1.selectbox("Metode Containment:", ["Open Diking", "Remote Impounding"], key="cont_tr")
-    tipe_atap = cont2.selectbox("Tipe Atap Tangki:", ["Fixed Roof", "Floating Roof"], key="atap_tr")
+    containment_type = st.selectbox("Metode Containment:", ["Open Diking", "Remote Impounding"], key="cont_tr")
     st.markdown("</div>", unsafe_allow_html=True)
 
     st.markdown("<div class='custom-card'><div class='section-title'>Safety Distance</div>", unsafe_allow_html=True)
@@ -129,9 +158,7 @@ else:  # Persegi
 
     # TAMBAHAN BAGIAN SISTEM CONTAINMENT
     st.markdown("<div class='custom-card'><div class='section-title'>Sistem Containment</div>", unsafe_allow_html=True)
-    cont1, cont2 = st.columns(2)
-    containment_type = cont1.selectbox("Metode Containment:", ["Open Diking", "Remote Impounding"], key="cont_per")
-    tipe_atap = cont2.selectbox("Tipe Atap Tangki:", ["Fixed atau Horizontal", "Floating Roof"], key="atap_per")
+    containment_type = st.selectbox("Metode Containment:", ["Open Diking", "Remote Impounding"], key="cont_per")
     st.markdown("</div>", unsafe_allow_html=True)
 
     st.markdown("<div class='custom-card'><div class='section-title'>Safety Distance</div>", unsafe_allow_html=True)
@@ -183,26 +210,20 @@ if st.button("💾 HITUNG SEKARANG", type="primary", use_container_width=True):
     max_d_s = max(d_safety_1, d_safety_2)
     sum_d_s = d_safety_1 + d_safety_2
     
-    # PERUBAHAN LOGIKA SESUAI GAMBAR TABEL
+    # PERUBAHAN LOGIKA SESUAI GAMBAR TABEL (Fokus Tangki Fix/Horizontal)
     if max_d_s <= 45:
         shell_to_shell = (1/6) * sum_d_s
     else:
         if containment_type == "Remote Impounding":
-            if tipe_atap == "Floating Roof":
-                shell_to_shell = (1/6) * sum_d_s
-            else: # Fixed Roof
-                if kelas_bbm_calc in ["Class I", "Class II"]:
-                    shell_to_shell = (1/4) * sum_d_s
-                else: # Class IIIA
-                    shell_to_shell = (1/6) * sum_d_s
-        else: # Open Diking
-            if tipe_atap == "Floating Roof":
+            if kelas_bbm_calc in ["Class I", "Class II"]:
                 shell_to_shell = (1/4) * sum_d_s
-            else: # Fixed Roof
-                if kelas_bbm_calc in ["Class I", "Class II"]:
-                    shell_to_shell = (1/3) * sum_d_s
-                else: # Class IIIA
-                    shell_to_shell = (1/4) * sum_d_s
+            else: # Class IIIA
+                shell_to_shell = (1/6) * sum_d_s
+        else: # Open Diking
+            if kelas_bbm_calc in ["Class I", "Class II"]:
+                shell_to_shell = (1/3) * sum_d_s
+            else: # Class IIIA
+                shell_to_shell = (1/4) * sum_d_s
     
     # OUTPUT SESUAI PERMINTAAN
     tank_to_road = dist_road # Shell to Building (Jalan - Nilai Kecil)
