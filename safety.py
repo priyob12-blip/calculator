@@ -1,7 +1,5 @@
 import streamlit as st
 import math
-from fpdf import FPDF
-from datetime import datetime
 
 # --- KONFIGURASI HALAMAN ---
 st.set_page_config(
@@ -10,10 +8,11 @@ st.set_page_config(
     layout="wide"
 )
 
-# --- CUSTOM CSS ---
+# --- CUSTOM CSS UNTUK UI MODERN & DESIGN KOTAK ---
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Inter:wght@400;700&display=swap');
+    
     .main-banner {
         background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
         url('https://images.unsplash.com/photo-1516937941344-00b4e0337589?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80');
@@ -26,13 +25,17 @@ st.markdown("""
         background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2);
         border-radius: 10px; padding: 20px; margin-bottom: 25px; position: relative; overflow: hidden;
     }
+    .custom-card::before {
+        content: ""; position: absolute; top: 0; left: 0; width: 10px; height: 40px;
+        background: #007BFF; border-radius: 0 0 10px 0;
+    }
     .section-title { font-family: 'Orbitron', sans-serif; font-size: 1.5rem; font-weight: 800; color: #000000; margin-bottom: 20px; padding-left: 15px; }
     .status-comply { color: #00ff88; font-family: 'Orbitron', sans-serif; font-size: 1.2rem; font-weight: bold; }
     .status-noncomply { color: #ff4b4b; font-family: 'Orbitron', sans-serif; font-size: 1.2rem; font-weight: bold; }
 </style>
 """, unsafe_allow_html=True)
 
-# --- BANNER ---
+# --- IMPLEMENTASI BANNER ---
 st.markdown("""
 <div class='main-banner'>
     <h1>BundSafe Tank Analytics</h1>
@@ -43,61 +46,14 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# --- CLASS PDF GENERATOR (COMPACT 1 PAGE) ---
-class PDFReport(FPDF):
-    def header(self):
-        self.set_font('Arial', 'B', 14)
-        self.cell(0, 8, 'Laporan Analisis Bundwall (BundSafe)', 0, 1, 'C')
-        self.set_font('Arial', '', 9)
-        self.cell(0, 5, f'Tanggal Cetak: {datetime.now().strftime("%d %B %Y")}', 0, 1, 'C') # Hanya Tanggal
-        self.line(10, 25, 200, 25)
-        self.ln(5)
-
-    def chapter_title(self, label):
-        self.set_font('Arial', 'B', 10)
-        self.set_fill_color(230, 230, 230)
-        self.cell(0, 6, f' {label}', 0, 1, 'L', 1)
-        self.ln(1)
-
-    def add_row_compact(self, label, value):
-        self.set_font('Arial', '', 9)
-        self.cell(80, 5, label, 0)
-        self.set_font('Arial', 'B', 9)
-        self.cell(0, 5, f": {value}", 0, 1)
-
-# --- FUNGSI HITUNGAN ---
+# --- FUNGSI PEMBANTU SAFETY DISTANCE ---
 def estimate_cap(dia):
-    if dia <= 6.68: return 150
-    elif dia <= 7.64: return 200
-    elif dia <= 8.59: return 250
-    elif dia <= 9.55: return 500
-    elif dia <= 11.46: return 700
-    elif dia <= 13.37: return 1500
-    elif dia <= 15.28: return 2000
-    elif dia <= 17.19: return 2500
-    elif dia <= 19.10: return 5000
-    elif dia <= 27.69: return 10000
-    elif dia <= 30.56: return 12500
-    elif dia <= 33.42: return 15000
-    elif dia <= 40.11: return 20000
-    elif dia <= 43.93: return 25000
-    elif dia <= 48.70: return 30000
     else: return 50000
 
 def get_nfpa_dist(cap):
-    if cap <= 1.045: return 1.5, 1.5
-    elif cap <= 2.85: return 3.0, 1.5
-    elif cap <= 45.6: return 4.5, 1.5
-    elif cap <= 114.0: return 6.0, 1.5
-    elif cap <= 190.0: return 9.0, 3.0
-    elif cap <= 380.0: return 15.0, 4.5
-    elif cap <= 1900.0: return 24.0, 7.5
-    elif cap <= 3800.0: return 30.0, 10.5
-    elif cap <= 7600.0: return 40.5, 13.5
-    elif cap <= 11400.0: return 49.5, 16.5
     else: return 52.5, 18.0
 
-# --- INPUT UI ---
+# --- BAGIAN INPUT UTAMA ---
 col_shape, col_reset = st.columns([4, 1])
 with col_shape:
     shape = st.selectbox("Pilih Jenis Bundwall:", ["Trapesium", "Persegi"], key="shape_select")
@@ -185,9 +141,9 @@ else:  # Persegi
     d_safety_2 = cs3.number_input("D. Tangki 2 (m)", min_value=0.0, key="sd_d2_pr")
     st.markdown("</div>", unsafe_allow_html=True)
 
-# --- LOGIKA & OUTPUT ---
+# --- LOGIKA PERHITUNGAN & OUTPUT ---
 if st.button("💾 HITUNG SEKARANG", type="primary", use_container_width=True):
-    # Rumus Volume (Trapesium Kompleks / Persegi)
+    # --- RUMUS ASLI (KOMPLEKS) UNTUK VOLUME BRUTO ---
     if shape == "Trapesium":
         t1_a = (panjang_luar - (2 * lebar_bawah))
         t1_b = (panjang_luar - ((lebar_atas + ((lebar_bawah - lebar_atas) / 2)) * 2))
@@ -208,47 +164,53 @@ if st.button("💾 HITUNG SEKARANG", type="primary", use_container_width=True):
     vol_efektif_bund = vol_bruto - vol_pond_tank
     vol_min = kapasitas_tank_besar * 1.0
 
-    # Safety Distance
+    # --- LOGIKA SAFETY DISTANCE SEDERHANA ---
     est_kapasitas = estimate_cap(d_safety_1)
+    
+    # Ambil nilai langsung dari tabel (semua produk pakai tabel yg sama)
+    # dist_fac = Jarak ke Fasilitas (Besar)
+    # dist_road = Jarak ke Jalan (Kecil)
     dist_fac, dist_road = get_nfpa_dist(est_kapasitas) 
-
-    # Klasifikasi Teks (Dipindah ke sini agar bisa dipakai di logika perhitungan)
-    if produk in ["Pertalite", "Pertamax"]: kelas_bbm = "Class I"
-    elif produk == "Solar": kelas_bbm = "Class II"
-    else: kelas_bbm = "Class IIIA"
+    
+    # Menentukan klasifikasi cairan untuk logika tabel
+    if produk in ["Pertalite", "Pertamax"]:
+        kelas_bbm_calc = "Class I"
+    elif produk in ["Solar", "Avtur"]:
+        kelas_bbm_calc = "Class II"
+    else:
+        kelas_bbm_calc = "Class IIIA"
 
     max_d_s = max(d_safety_1, d_safety_2)
     sum_d_s = d_safety_1 + d_safety_2
     
-    # --- LOGIKA SHELL TO SHELL (DITAMBAHKAN SESUAI REQUEST) ---
+    # PERUBAHAN LOGIKA SESUAI GAMBAR TABEL
     if max_d_s <= 45:
         shell_to_shell = (1/6) * sum_d_s
     else:
         if containment_type == "Remote Impounding":
             if tipe_atap == "Floating Roof":
                 shell_to_shell = (1/6) * sum_d_s
-            else: # Fixed atau Horizontal
-                if kelas_bbm in ["Class I", "Class II"]:
+            else: # Fixed Roof
+                if kelas_bbm_calc in ["Class I", "Class II"]:
                     shell_to_shell = (1/4) * sum_d_s
                 else: # Class IIIA
                     shell_to_shell = (1/6) * sum_d_s
         else: # Open Diking
             if tipe_atap == "Floating Roof":
                 shell_to_shell = (1/4) * sum_d_s
-            else: # Fixed atau Horizontal
-                if kelas_bbm in ["Class I", "Class II"]:
+            else: # Fixed Roof
+                if kelas_bbm_calc in ["Class I", "Class II"]:
                     shell_to_shell = (1/3) * sum_d_s
                 else: # Class IIIA
                     shell_to_shell = (1/4) * sum_d_s
-    # -----------------------------------------------------------
     
-    tank_to_road = dist_road 
-    tank_to_prop = dist_fac  
+    # OUTPUT SESUAI PERMINTAAN
+    tank_to_road = dist_road # Shell to Building (Jalan - Nilai Kecil)
+    tank_to_prop = dist_fac  # Shell to Property (Fasilitas - Nilai Besar)
 
     is_comply = vol_efektif_bund > kapasitas_tank_besar * 1 and tinggi_dinding <= 1.8
     status_class = "status-comply" if is_comply else "status-noncomply"
-    status_text = "COMPLY - AMAN" if is_comply else "NON COMPLY"
-    status_symbol = "✓" if is_comply else "✗"
+    status_text = "✓ COMPLY - AMAN" if is_comply else "✗ NON COMPLY"
 
     st.markdown(f"### 📈 HASIL ANALISIS")
     res1, res2, res3, res4 = st.columns(4)
@@ -258,121 +220,53 @@ if st.button("💾 HITUNG SEKARANG", type="primary", use_container_width=True):
     res2.metric("Volume Minimum", f"{vol_min:.2f} m³")
     with res3:
         st.write("Status Safety:")
-        st.markdown(f"<div class='{status_class}'>{status_symbol} {status_text}</div>", unsafe_allow_html=True)
+        st.markdown(f"<div class='{status_class}'>{status_text}</div>", unsafe_allow_html=True)
     
     if d_safety_1 > 0:
         st.markdown("---")
         st.write(f"**Safety Distance Minimum (NFPA 30 - {produk}):**")
         sd_col1, sd_col2, sd_col3 = st.columns(3)
         sd_col1.metric("Shell to Shell", f"{shell_to_shell:.2f} m")
-        sd_col2.metric("Shell to Building", f"{tank_to_road} m")
-        sd_col3.metric("Shell to Property", f"{tank_to_prop} m")
-        st.caption(f"Estimasi Kapasitas: {est_kapasitas} KL. Klasifikasi: {kelas_bbm} (Tabel Utama NFPA 30).")
+        sd_col2.metric("Shell to Building", f"{tank_to_road} m") # Merujuk ke Jalan (Nilai Kecil)
+        sd_col3.metric("Shell to Property", f"{tank_to_prop} m") # Merujuk ke Fasilitas (Nilai Besar)
+        
+        # Klasifikasi Teks - DIEDIT BAGIAN INI SESUAI REQUEST
+        if produk in ["Pertalite", "Pertamax"]:
+            kelas_bbm = "Class I"
+        elif produk in ["Solar", "Avtur"]: # Avtur pindah ke Class II bersama Solar
+            kelas_bbm = "Class II"
+        else: # MFO
+            kelas_bbm = "Class IIIA"
+            
+        caption_text = f"Estimasi Kapasitas: {est_kapasitas} KL. Klasifikasi: {kelas_bbm} (Tabel Utama NFPA 30)."
+        st.caption(caption_text)
 
-    # Fitur Rekomendasi & List untuk PDF
-    rec_text_fisik = []
-    rec_text_admin = []
-    
+    # --- FITUR REKOMENDASI ---
     if not is_comply:
         st.markdown("<br>", unsafe_allow_html=True)
         with st.expander("💡 LIHAT REKOMENDASI "):
             st.markdown("### Rekomendasi Teknis HSSE")
             kekurangan = vol_min - vol_efektif_bund
-            rc1, rc2 = st.columns(2)
-            with rc1:
+            
+            rec_col1, rec_col2 = st.columns(2)
+            
+            with rec_col1:
                 st.info("**Opsi Rekayasa Fisik**")
-                tambah_h = kekurangan / (vol_bruto / tinggi_dinding if tinggi_dinding>0 else 1)
+                luas_estimasi = vol_bruto / tinggi_dinding if tinggi_dinding > 0 else 1
+                tambah_h = kekurangan / luas_estimasi
                 target_h = tinggi_dinding + tambah_h
-                if target_h <= 1.8:
-                    msg = f"1. Peninggian Dinding: Target baru {target_h:.2f}m (Max 1.8m)."
-                else:
-                    msg = f"1. Perluasan Area: Peninggian dinding > 1.8m tidak disarankan."
-                st.write(msg)
-                rec_text_fisik.append(msg)
                 
-                msg2 = "2. Remote Impounding: Gunakan saluran peluap ke kolam sekunder."
-                st.write(msg2)
-                rec_text_fisik.append(msg2)
+                if target_h <= 1.8:
+                    st.write(f"1. **Peninggian Dinding:** Target tinggi dinding baru adalah **{target_h:.2f} m** (Sesuai batas NFPA < 1.8m).")
+                else:
+                    st.write(f"1. **Perluasan Area:** Peninggian dinding hingga 1.8m tidak cukup. Diperlukan perluasan panjang/lebar area.")
+                
+                st.write("2. **Remote Impounding:** Integrasikan antar bundwall untuk atasi keterbatasan volume. Gunakan sistem Remote Impounding dengan saluran peluap ke kolam sekunder")
 
-            with rc2:
-                st.info("**Opsi Administratif**")
-                aman_kl = vol_efektif_bund
-                msg3 = f"1. Downgrading: Batasi isi max {aman_kl:.2f} KL."
-                st.write(msg3)
-                rec_text_admin.append(msg3)
-                msg4 = "2. Adjustment HLA: Atur ulang sensor High Level Alarm."
-                st.write(msg4)
-                rec_text_admin.append(msg4)
-            st.warning("⚠️ Perubahan fisik wajib melalui kajian teknis.")
-
-    # --- PDF GENERATOR (FIXED) ---
-    pdf = PDFReport()
-    pdf.add_page()
-    
-    # 1. Info
-    pdf.chapter_title('1. Data Operasional')
-    dim_str = f"P: {panjang_luar}m, L: {lebar_luar}m, T: {tinggi_dinding}m" if shape == 'Trapesium' else f"P: {panjang}m, L: {lebar}m, T: {tinggi_dinding}m"
-    pdf.add_row_compact('Jenis Bundwall', shape)
-    pdf.add_row_compact('Produk', f"{produk} ({kelas_bbm})")
-    pdf.add_row_compact('Kapasitas Max', f"{kapasitas_tank_besar} KL")
-    pdf.add_row_compact('Dimensi', dim_str)
-    pdf.ln(2)
-
-    # 2. Hasil
-    pdf.chapter_title('2. Analisis Kapasitas')
-    pdf.add_row_compact('Volume Bruto', f'{vol_bruto:.2f} m3')
-    pdf.add_row_compact('Vol. Pondasi+Tank', f'{vol_pond_tank:.2f} m3')
-    pdf.add_row_compact('Volume Efektif', f'{vol_efektif_bund:.2f} m3')
-    pdf.add_row_compact('Volume Minimum', f'{vol_min:.2f} m3')
-    
-    pdf.ln(2)
-    pdf.set_font('Arial', 'B', 10)
-    if is_comply:
-        pdf.set_text_color(0, 128, 0)
-        pdf.cell(0, 6, f'STATUS: {status_text}', 0, 1)
-    else:
-        pdf.set_text_color(255, 0, 0)
-        pdf.cell(0, 6, f'STATUS: {status_text}', 0, 1)
-    pdf.set_text_color(0, 0, 0)
-    pdf.ln(2)
-
-    # 3. Safety Distance
-    pdf.chapter_title('3. Analisis Safety Distance')
-    pdf.add_row_compact('Klasifikasi', f'{kelas_bbm}')
-    pdf.add_row_compact('Shell to Shell', f'{shell_to_shell:.2f} m')
-    pdf.add_row_compact('Shell to Building', f'{tank_to_road} m')
-    pdf.add_row_compact('Shell to Property', f'{tank_to_prop} m')
-    pdf.ln(2)
-
-    # 4. Rekomendasi
-    if not is_comply:
-        pdf.chapter_title('4. Rekomendasi Perbaikan')
-        pdf.set_font('Arial', '', 9)
-        if rec_text_fisik:
-            pdf.set_font('Arial', 'B', 9)
-            pdf.cell(0, 5, 'Fisik:', 0, 1)
-            pdf.set_font('Arial', '', 9)
-            for item in rec_text_fisik:
-                pdf.multi_cell(0, 5, f"- {item}")
-        if rec_text_admin:
-            pdf.ln(1)
-            pdf.set_font('Arial', 'B', 9)
-            pdf.cell(0, 5, 'Administratif:', 0, 1)
-            pdf.set_font('Arial', '', 9)
-            for item in rec_text_admin:
-                pdf.multi_cell(0, 5, f"- {item}")
-        pdf.ln(2)
-        pdf.set_font('Arial', 'I', 8)
-        pdf.set_text_color(100, 0, 0)
-        pdf.multi_cell(0, 4, "Catatan: Perubahan fisik wajib kajian teknis.")
-
-    # Output PDF
-    pdf_bytes = pdf.output(dest='S').encode('latin-1', 'ignore')
-    
-    st.download_button(
-        label="📄 DOWNLOAD LAPORAN PDF",
-        data=pdf_bytes,
-        file_name=f"Laporan_BundSafe_{datetime.now().strftime('%Y%m%d')}.pdf",
-        mime='application/pdf',
-        use_container_width=True
-    )
+            with rec_col2:
+                st.info("**Opsi Administratif & Operasional**")
+                aman_kl = vol_efektif_bund / 1.0
+                st.write(f"1. **Downgrading Kapasitas:** Batasi pengisian tangki terbesar maksimal hingga **{aman_kl:.2f} KL**.")
+                st.write("2. **Adjustment HLA:** Atur ulang sensor *High Level Alarm* (HLA) sesuai kapasitas bundwall saat ini.")
+                
+            st.warning("⚠️ Perubahan fisik wajib melalui kajian teknis sipil dan pemastian jarak aman (Safety Distance) tetap terjaga.")
