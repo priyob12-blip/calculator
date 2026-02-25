@@ -67,11 +67,9 @@ def estimate_cap(dia):
     else: return 50000
 
 def get_nfpa_dist(cap):
-    # Logika diperbaiki agar pas dengan range Tabel NFPA 30
-    # Mengembalikan nilai MUTLAK dari tabel NFPA (Tabel Kiri/Utama untuk semua Kelas I, II, IIIA)
+    # Mengembalikan nilai MUTLAK dari tabel NFPA (Tabel Dasar B)
     # dist_fac = Jarak ke Fasilitas/Bangunan (Kolom Tengah Tabel - Nilai Besar)
     # dist_road = Jarak ke Jalan Umum/Sisi Terdekat (Kolom Kanan Tabel - Nilai Kecil)
-    
     if cap <= 1.045: return 1.5, 1.5
     elif cap <= 2.85: return 3.0, 1.5
     elif cap <= 45.6: return 4.5, 1.5
@@ -119,11 +117,12 @@ if shape == "Trapesium":
             d_tanks[i] = ct4.number_input(f"Diameter Tangki {i+1}", min_value=0.0, key=f"d_tk_tr_{i}")
     st.markdown("</div>", unsafe_allow_html=True)
 
-    # TAMBAHAN BAGIAN SISTEM CONTAINMENT
+    # TAMBAHAN BAGIAN SISTEM CONTAINMENT (DITAMBAH 1 KOLOM UNTUK PROTEKSI)
     st.markdown("<div class='custom-card'><div class='section-title'>Sistem Containment</div>", unsafe_allow_html=True)
-    cont1, cont2 = st.columns(2)
+    cont1, cont2, cont3 = st.columns(3)
     containment_type = cont1.selectbox("Metode Containment:", ["Open Diking", "Remote Impounding"], key="cont_tr")
     tipe_atap = cont2.selectbox("Tipe Atap Tangki:", ["Fixed Roof", "Floating Roof"], key="atap_tr")
+    jenis_proteksi = cont3.selectbox("Sistem Proteksi:", ["Protection for Exposures (Sprinkler/Hydrant)", "Approved Foam System", "Non Proteksi (None)"], key="prot_tr")
     st.markdown("</div>", unsafe_allow_html=True)
 
     st.markdown("<div class='custom-card'><div class='section-title'>Safety Distance</div>", unsafe_allow_html=True)
@@ -158,11 +157,12 @@ else:  # Persegi
             d_tanks[i] = cp4.number_input(f"Diameter Tangki {i+1}", min_value=0.0, key=f"d_tk_pr_{i}")
     st.markdown("</div>", unsafe_allow_html=True)
 
-    # TAMBAHAN BAGIAN SISTEM CONTAINMENT
+    # TAMBAHAN BAGIAN SISTEM CONTAINMENT (DITAMBAH 1 KOLOM UNTUK PROTEKSI)
     st.markdown("<div class='custom-card'><div class='section-title'>Sistem Containment</div>", unsafe_allow_html=True)
-    cont1, cont2 = st.columns(2)
+    cont1, cont2, cont3 = st.columns(3)
     containment_type = cont1.selectbox("Metode Containment:", ["Open Diking", "Remote Impounding"], key="cont_per")
     tipe_atap = cont2.selectbox("Tipe Atap Tangki:", ["Fixed atau Horizontal", "Floating Roof"], key="atap_per")
+    jenis_proteksi = cont3.selectbox("Sistem Proteksi:", ["Protection for Exposures (Sprinkler/Hydrant)", "Approved Foam System", "Non Proteksi (None)"], key="prot_per")
     st.markdown("</div>", unsafe_allow_html=True)
 
     st.markdown("<div class='custom-card'><div class='section-title'>Safety Distance</div>", unsafe_allow_html=True)
@@ -199,10 +199,30 @@ if st.button("💾 HITUNG SEKARANG", type="primary", use_container_width=True):
     est_kapasitas = estimate_cap(d_safety_1)
     
     # Ambil nilai langsung dari tabel (semua produk pakai tabel yg sama)
-    # dist_fac = Jarak ke Fasilitas (Besar)
-    # dist_road = Jarak ke Jalan (Kecil)
     dist_fac, dist_road = get_nfpa_dist(est_kapasitas) 
     
+    # =======================================================================
+    # LOGIKA BARU PENGALI (MULTIPLIER) BERDASARKAN TABEL NFPA 30 22.4.1.1(a)
+    # =======================================================================
+    if tipe_atap == "Floating Roof":
+        mult_prop = 0.5
+        mult_build = 0.5
+    else:  # Fixed atau Horizontal
+        if jenis_proteksi == "Approved Foam System":
+            mult_prop = 0.5
+            mult_build = 0.5
+        elif jenis_proteksi == "Non Proteksi (None)":
+            mult_prop = 2.0  # Hukuman 2x jarak untuk batas properti
+            mult_build = 1.0 # Tidak ada penalti jarak ke jalan/bangunan
+        else: # Protection for Exposures (Sprinkler/Hydrant) - Default 1x
+            mult_prop = 1.0
+            mult_build = 1.0
+            
+    # Hasil akhir (Base Distance x Multiplier)
+    tank_to_road = dist_road * mult_build # Shell to Building (Jalan)
+    tank_to_prop = dist_fac * mult_prop   # Shell to Property (Fasilitas)
+    # =======================================================================
+
     # Menentukan klasifikasi cairan untuk logika tabel
     if produk in ["Pertalite", "Pertamax"]:
         kelas_bbm_calc = "Class I"
@@ -235,10 +255,6 @@ if st.button("💾 HITUNG SEKARANG", type="primary", use_container_width=True):
                 else: # Class IIIA
                     shell_to_shell = (1/4) * sum_d_s
     
-    # OUTPUT SESUAI PERMINTAAN
-    tank_to_road = dist_road # Shell to Building (Jalan - Nilai Kecil)
-    tank_to_prop = dist_fac  # Shell to Property (Fasilitas - Nilai Besar)
-
     is_comply = vol_efektif_bund > kapasitas_tank_besar * 1 and tinggi_dinding <= 1.8
     status_class = "status-comply" if is_comply else "status-noncomply"
     status_text = "✓ COMPLY - AMAN" if is_comply else "✗ NON COMPLY"
@@ -258,8 +274,8 @@ if st.button("💾 HITUNG SEKARANG", type="primary", use_container_width=True):
         st.write(f"**Safety Distance Minimum (NFPA 30 - {produk}):**")
         sd_col1, sd_col2, sd_col3 = st.columns(3)
         sd_col1.metric("Shell to Shell", f"{shell_to_shell:.2f} m")
-        sd_col2.metric("Shell to Building", f"{tank_to_road} m") # Merujuk ke Jalan (Nilai Kecil)
-        sd_col3.metric("Shell to Property", f"{tank_to_prop} m") # Merujuk ke Fasilitas (Nilai Besar)
+        sd_col2.metric("Shell to Building", f"{tank_to_road:.2f} m") # Merujuk ke Jalan 
+        sd_col3.metric("Shell to Property", f"{tank_to_prop:.2f} m") # Merujuk ke Fasilitas 
         
         # Klasifikasi Teks - DIEDIT BAGIAN INI SESUAI REQUEST
         if produk in ["Pertalite", "Pertamax"]:
