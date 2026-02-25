@@ -216,12 +216,17 @@ if st.button("💾 HITUNG SEKARANG", type="primary", use_container_width=True):
     dist_fac, dist_road = get_nfpa_dist(est_kapasitas) 
     
     # =======================================================================
-    # LOGIKA PENGALI (MULTIPLIER) BERDASARKAN TABEL NFPA 30 22.4.1.1(a)
+    # LOGIKA BERDASARKAN TABEL NFPA 30 22.4.1.1(a) & Floating Roof
     # =======================================================================
     if tipe_atap == "Floating Roof":
-        mult_prop = 0.5
-        mult_build = 0.5
-    else:  # Fixed atau Horizontal
+        # Floating Roof MURNI menggunakan DIAMETER, bukan Tabel B (Kapasitas)
+        if jenis_proteksi == "Non Proteksi (None)":
+            tank_to_prop = min(d_safety_1 * 1.0, 52.5) # Max 175 ft (52.5 meter)
+            tank_to_road = (1/6) * d_safety_1
+        else: # Protection for Exposures
+            tank_to_prop = 0.5 * d_safety_1
+            tank_to_road = (1/6) * d_safety_1
+    else:  # Fixed atau Horizontal (Menggunakan Tabel B x Multiplier)
         if jenis_proteksi == "Approved Foam System":
             mult_prop = 0.5
             mult_build = 0.5
@@ -232,9 +237,9 @@ if st.button("💾 HITUNG SEKARANG", type="primary", use_container_width=True):
             mult_prop = 1.0
             mult_build = 1.0
             
-    # Hasil akhir (Base Distance x Multiplier)
-    tank_to_road = dist_road * mult_build # Shell to Building (Jalan)
-    tank_to_prop = dist_fac * mult_prop   # Shell to Property (Fasilitas)
+        # Hasil akhir (Base Distance x Multiplier)
+        tank_to_road = dist_road * mult_build # Shell to Building (Jalan)
+        tank_to_prop = dist_fac * mult_prop   # Shell to Property (Fasilitas)
     # =======================================================================
 
     # Menentukan klasifikasi cairan untuk logika tabel
