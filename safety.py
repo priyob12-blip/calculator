@@ -117,19 +117,20 @@ if shape == "Trapesium":
             d_tanks[i] = ct4.number_input(f"Diameter Tangki {i+1}", min_value=0.0, key=f"d_tk_tr_{i}")
     st.markdown("</div>", unsafe_allow_html=True)
 
-    # TAMBAHAN BAGIAN SISTEM CONTAINMENT (DITAMBAH 1 KOLOM UNTUK PROTEKSI)
+    # BAGIAN SISTEM CONTAINMENT (Kembali ke 2 kolom)
     st.markdown("<div class='custom-card'><div class='section-title'>Sistem Containment</div>", unsafe_allow_html=True)
-    cont1, cont2, cont3 = st.columns(3)
+    cont1, cont2 = st.columns(2)
     containment_type = cont1.selectbox("Metode Containment:", ["Open Diking", "Remote Impounding"], key="cont_tr")
     tipe_atap = cont2.selectbox("Tipe Atap Tangki:", ["Fixed Roof", "Floating Roof"], key="atap_tr")
-    jenis_proteksi = cont3.selectbox("Sistem Proteksi:", ["Protection for Exposures (Sprinkler/Hydrant)", "Approved Foam System", "Non Proteksi (None)"], key="prot_tr")
     st.markdown("</div>", unsafe_allow_html=True)
 
+    # BAGIAN SAFETY DISTANCE (Menjadi 4 kolom, Proteksi disisipkan di sini)
     st.markdown("<div class='custom-card'><div class='section-title'>Safety Distance</div>", unsafe_allow_html=True)
-    cs1, cs2, cs3 = st.columns(3)
+    cs1, cs2, cs3, cs4 = st.columns(4)
     produk = cs1.selectbox("Jenis BBM:", ["Pertalite", "Pertamax", "Solar", "Avtur", "MFO"], key="prod_tr")
-    d_safety_1 = cs2.number_input("D. Tangki 1 (m)", min_value=0.0, key="sd_d1_tr")
-    d_safety_2 = cs3.number_input("D. Tangki 2 (m)", min_value=0.0, key="sd_d2_tr")
+    jenis_proteksi = cs2.selectbox("Sistem Proteksi:", ["Protection for Exposures (Sprinkler/Hydrant)", "Approved Foam System", "Non Proteksi (None)"], key="prot_tr")
+    d_safety_1 = cs3.number_input("D. Tangki 1 (m)", min_value=0.0, key="sd_d1_tr")
+    d_safety_2 = cs4.number_input("D. Tangki 2 (m)", min_value=0.0, key="sd_d2_tr")
     st.markdown("</div>", unsafe_allow_html=True)
 
 else:  # Persegi
@@ -157,19 +158,20 @@ else:  # Persegi
             d_tanks[i] = cp4.number_input(f"Diameter Tangki {i+1}", min_value=0.0, key=f"d_tk_pr_{i}")
     st.markdown("</div>", unsafe_allow_html=True)
 
-    # TAMBAHAN BAGIAN SISTEM CONTAINMENT (DITAMBAH 1 KOLOM UNTUK PROTEKSI)
+    # BAGIAN SISTEM CONTAINMENT (Kembali ke 2 kolom)
     st.markdown("<div class='custom-card'><div class='section-title'>Sistem Containment</div>", unsafe_allow_html=True)
-    cont1, cont2, cont3 = st.columns(3)
+    cont1, cont2 = st.columns(2)
     containment_type = cont1.selectbox("Metode Containment:", ["Open Diking", "Remote Impounding"], key="cont_per")
     tipe_atap = cont2.selectbox("Tipe Atap Tangki:", ["Fixed atau Horizontal", "Floating Roof"], key="atap_per")
-    jenis_proteksi = cont3.selectbox("Sistem Proteksi:", ["Protection for Exposures (Sprinkler/Hydrant)", "Approved Foam System", "Non Proteksi (None)"], key="prot_per")
     st.markdown("</div>", unsafe_allow_html=True)
 
+    # BAGIAN SAFETY DISTANCE (Menjadi 4 kolom, Proteksi disisipkan di sini)
     st.markdown("<div class='custom-card'><div class='section-title'>Safety Distance</div>", unsafe_allow_html=True)
-    cs1, cs2, cs3 = st.columns(3)
+    cs1, cs2, cs3, cs4 = st.columns(4)
     produk = cs1.selectbox("Jenis BBM:", ["Pertalite", "Pertamax", "Solar", "Avtur", "MFO"], key="prod_per")
-    d_safety_1 = cs2.number_input("D. Tangki 1 (m)", min_value=0.0, key="sd_d1_pr")
-    d_safety_2 = cs3.number_input("D. Tangki 2 (m)", min_value=0.0, key="sd_d2_pr")
+    jenis_proteksi = cs2.selectbox("Sistem Proteksi:", ["Protection for Exposures (Sprinkler/Hydrant)", "Approved Foam System", "Non Proteksi (None)"], key="prot_per")
+    d_safety_1 = cs3.number_input("D. Tangki 1 (m)", min_value=0.0, key="sd_d1_pr")
+    d_safety_2 = cs4.number_input("D. Tangki 2 (m)", min_value=0.0, key="sd_d2_pr")
     st.markdown("</div>", unsafe_allow_html=True)
 
 # --- LOGIKA PERHITUNGAN & OUTPUT ---
@@ -202,7 +204,7 @@ if st.button("💾 HITUNG SEKARANG", type="primary", use_container_width=True):
     dist_fac, dist_road = get_nfpa_dist(est_kapasitas) 
     
     # =======================================================================
-    # LOGIKA BARU PENGALI (MULTIPLIER) BERDASARKAN TABEL NFPA 30 22.4.1.1(a)
+    # LOGIKA PENGALI (MULTIPLIER) BERDASARKAN TABEL NFPA 30 22.4.1.1(a)
     # =======================================================================
     if tipe_atap == "Floating Roof":
         mult_prop = 0.5
@@ -277,10 +279,10 @@ if st.button("💾 HITUNG SEKARANG", type="primary", use_container_width=True):
         sd_col2.metric("Shell to Building", f"{tank_to_road:.2f} m") # Merujuk ke Jalan 
         sd_col3.metric("Shell to Property", f"{tank_to_prop:.2f} m") # Merujuk ke Fasilitas 
         
-        # Klasifikasi Teks - DIEDIT BAGIAN INI SESUAI REQUEST
+        # Klasifikasi Teks
         if produk in ["Pertalite", "Pertamax"]:
             kelas_bbm = "Class I"
-        elif produk in ["Solar", "Avtur"]: # Avtur pindah ke Class II bersama Solar
+        elif produk in ["Solar", "Avtur"]: 
             kelas_bbm = "Class II"
         else: # MFO
             kelas_bbm = "Class IIIA"
