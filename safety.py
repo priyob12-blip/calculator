@@ -190,11 +190,23 @@ else:  # Persegi
 if st.button("💾 HITUNG SEKARANG", type="primary", use_container_width=True):
     # --- RUMUS ASLI (KOMPLEKS) UNTUK VOLUME BRUTO ---
     if shape == "Trapesium":
-        t1_a = (panjang_luar - (2 * lebar_bawah))
-        t1_b = (panjang_luar - ((lebar_atas + ((lebar_bawah - lebar_atas) / 2)) * 2))
-        term1 = ((t1_a + t1_b) / 2 * tinggi_dinding) * (lebar_luar - (2 * lebar_bawah))
+        # 1. Hitung Kemiringan Sisi (s)
         s_val = (lebar_bawah - lebar_atas) / 2
-        term2 = ((lebar_bawah * s_val) / 2) * (panjang_luar - (s_val + lebar_bawah)) * 2
+        
+        # 2. Hitung Dimensi Rongga Dalam
+        t1_a = panjang_luar - (2 * lebar_bawah)            # Lebar Dalam Bawah (W1)
+        t1_b = panjang_luar - (2 * (lebar_atas + s_val))   # Lebar Dalam Atas (W2)
+        l_eff = lebar_luar - (2 * lebar_bawah)             # Panjang Efektif (Leff)
+        
+        # 3. Hitung Volume Bagian Tengah (Prisma Trapesium)
+        term1 = ((t1_a + t1_b) / 2) * tinggi_dinding * l_eff
+        
+        # 4. Hitung Volume Bagian Samping (2 Prisma Segitiga)
+        # ---> KOREKSI KRITIS: Menggunakan tinggi_dinding (h), BUKAN lebar_bawah (b)
+        # ---> KOREKSI RUMUS: Panjang sisinya langsung mengambil t1_b (W2)
+        term2 = ((tinggi_dinding * s_val) / 2) * t1_b * 2
+        
+        # 5. Total Volume Bruto
         vol_bruto = term1 + term2
     else:
         vol_bruto = tinggi_dinding * (panjang - 2*lebar_dinding) * (lebar - 2*panjang_tebal_dinding)
