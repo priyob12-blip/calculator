@@ -135,8 +135,8 @@ if shape == "Trapesium":
     cs1, cs2, cs3, cs4 = st.columns(4)
     produk = cs1.selectbox("Jenis BBM:", ["Pertalite", "Pertamax", "Solar", "Avtur", "MFO"], key="prod_tr")
     jenis_proteksi = cs2.selectbox("Sistem Proteksi:", opsi_proteksi, key="prot_tr")
-    d_safety_1 = cs3.number_input("D. Tangki 1 (m)", min_value=0.0, key="sd_d1_tr")
-    d_safety_2 = cs4.number_input("D. Tangki 2 (m)", min_value=0.0, key="sd_d2_tr")
+    d_safety_1 = cs3.number_input("Diameter Tangki pembanding 1 (m)", min_value=0.0, key="sd_d1_tr")
+    d_safety_2 = cs4.number_input("Diameter Tangki Pembanding 2 (m)", min_value=0.0, key="sd_d2_tr")
     st.markdown("</div>", unsafe_allow_html=True)
 
 else:  # Persegi
@@ -150,7 +150,7 @@ else:  # Persegi
     st.markdown("<div class='custom-card'><div class='section-title'>Dimensi Dinding</div>", unsafe_allow_html=True)
     col4, col5, col6 = st.columns(3)
     lebar_dinding = col4.number_input("Lebar Dinding (m)", min_value=0.0, key="ld1_per")
-    panjang_tebal_dinding = col5.number_input("Ketebalan Dinding (m)", min_value=0.0, key="ld2_per")
+    panjang_tebal_dinding = col5.number_input("Panjang Dinding (m)", min_value=0.0, key="ld2_per")
     kapasitas_tank_besar = col6.number_input("Kapasitas Tangki Terbesar (KL)", min_value=0.0, key="kap_per")
     st.markdown("</div>", unsafe_allow_html=True)
 
