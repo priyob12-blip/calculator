@@ -316,7 +316,7 @@ if st.button("💾 HITUNG SEKARANG", type="primary", use_container_width=True):
         else: # MFO
             kelas_bbm = "Class IIIA"
             
-        caption_text = f"Estimasi Kapasitas: {est_kapasitas} KL. Klasifikasi: {kelas_bbm} (Tabel Utama NFPA 30)."
+        caption_text = f"Klasifikasi: {kelas_bbm} (Tabel Utama NFPA 30)."
         st.caption(caption_text)
 
     # --- FITUR REKOMENDASI ---
