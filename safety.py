@@ -144,7 +144,6 @@ else:  # Persegi
     col1, col2, col3 = st.columns(3)
     panjang = col1.number_input("Panjang (m)", min_value=0.0, key="p_per")
     lebar = col2.number_input("Lebar (m)", min_value=0.0, key="l_per")
-    tinggi_dinding = col3.number_input("Tinggi Dinding (m)", min_value=0.0, key="t_per")
     st.markdown("</div>", unsafe_allow_html=True)
 
     st.markdown("<div class='custom-card'><div class='section-title'>Dimensi Dinding</div>", unsafe_allow_html=True)
@@ -209,7 +208,7 @@ if st.button("💾 HITUNG SEKARANG", type="primary", use_container_width=True):
         # 5. Total Volume Bruto
         vol_bruto = term1 + term2
     else:
-        vol_bruto = tinggi_dinding * (panjang - 2*lebar_dinding) * (lebar - 2*panjang_tebal_dinding)
+        vol_bruto = lebar_dinding * (panjang - 2*lebar_dinding) * (lebar - 2*panjang_tebal_dinding)
 
     vol_pond_tank = 0
     for i in range(5):
