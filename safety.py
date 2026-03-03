@@ -182,8 +182,8 @@ else:  # Persegi
     cs1, cs2, cs3, cs4 = st.columns(4)
     produk = cs1.selectbox("Jenis BBM:", ["Pertalite", "Pertamax", "Solar", "Avtur", "MFO"], key="prod_per")
     jenis_proteksi = cs2.selectbox("Sistem Proteksi:", opsi_proteksi, key="prot_per")
-    d_safety_1 = cs3.number_input("D. Tangki 1 (m)", min_value=0.0, key="sd_d1_pr")
-    d_safety_2 = cs4.number_input("D. Tangki 2 (m)", min_value=0.0, key="sd_d2_pr")
+    d_safety_1 = cs3.number_input("Diameter Tangki pembanding 1 (m)", min_value=0.0, key="sd_d1_pr")
+    d_safety_2 = cs4.number_input("Diameter Tangki pembanding 2 (m)", min_value=0.0, key="sd_d2_pr")
     st.markdown("</div>", unsafe_allow_html=True)
 
 # --- LOGIKA PERHITUNGAN & OUTPUT ---
