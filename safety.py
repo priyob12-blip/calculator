@@ -111,8 +111,8 @@ if shape == "Trapesium":
     for i in range(5):
         with st.expander(f"Tangki {i+1}"):
             ct1, ct2, ct3, ct4 = st.columns(4)
-            d_atas_pond[i] = ct1.number_input(f"D. Atas Pondasi {i+1}", min_value=0.0, key=f"d_at_tr_{i}")
-            d_bawah_pond[i] = ct2.number_input(f"D. Bawah Pondasi {i+1}", min_value=0.0, key=f"d_bw_tr_{i}")
+            d_atas_pond[i] = ct1.number_input(f"Diameter Atas Pondasi {i+1}", min_value=0.0, key=f"d_at_tr_{i}")
+            d_bawah_pond[i] = ct2.number_input(f"Diameter Bawah Pondasi {i+1}", min_value=0.0, key=f"d_bw_tr_{i}")
             t_pondasis[i] = ct3.number_input(f"Tinggi Pondasi {i+1}", min_value=0.0, key=f"t_pd_tr_{i}")
             d_tanks[i] = ct4.number_input(f"Diameter Tangki {i+1}", min_value=0.0, key=f"d_tk_tr_{i}")
     st.markdown("</div>", unsafe_allow_html=True)
