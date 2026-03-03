@@ -1,7 +1,7 @@
 import streamlit as st
 import math
 
-# --- KONFIGURASI HALAMAN ---
+# --- KONFIGURASI HALQUARE ---
 st.set_page_config(
     page_title="BundSafe Tank Analytics", 
     page_icon="⚡", 
@@ -142,17 +142,16 @@ if shape == "Trapesium":
 else:  # Persegi
     st.markdown("<div class='custom-card'><div class='section-title'>Bundwall Persegi</div>", unsafe_allow_html=True)
     col1, col2 = st.columns(2)
-    # Meminta input "panjang" saja yang mana akan mewakili nilai lebar area karena bentuknya persegi
-    panjang = col1.number_input("Panjang & Lebar (m)", min_value=0.0, key="p_per")
-    lebar = panjang # Disamakan dengan input panjang
-    tinggi_dinding = col2.number_input("Tinggi Dinding (m)", min_value=0.0, key="t_per")
+    panjang = col1.number_input("Panjang (m)", min_value=0.0, key="p_per")
+    lebar = col2.number_input("Lebar (m)", min_value=0.0, key="l_per")
+    # tinggi_dinding dihilangkan karena sama dengan panjang
+    tinggi_dinding = panjang 
     st.markdown("</div>", unsafe_allow_html=True)
 
     st.markdown("<div class='custom-card'><div class='section-title'>Dimensi Dinding</div>", unsafe_allow_html=True)
     col4, col6 = st.columns(2)
-    # Meminta 1 nilai lebar dinding dan diasumsikan sama tebal untuk seluruh sisinya
-    lebar_dinding = col4.number_input("Tebal Dinding (m)", min_value=0.0, key="ld1_per")
-    panjang_tebal_dinding = lebar_dinding # Disamakan
+    lebar_dinding = col4.number_input("Lebar Dinding (m)", min_value=0.0, key="ld1_per")
+    panjang_tebal_dinding = lebar_dinding # dihilangkan input panjang dinding krn asumsi ketebalan dinding sama 
     kapasitas_tank_besar = col6.number_input("Kapasitas Tangki Terbesar (KL)", min_value=0.0, key="kap_per")
     st.markdown("</div>", unsafe_allow_html=True)
 
@@ -211,8 +210,8 @@ if st.button("💾 HITUNG SEKARANG", type="primary", use_container_width=True):
         # 5. Total Volume Bruto
         vol_bruto = term1 + term2
     else:
-        # Menghitung volume dengan asumsi persegi sempurna (Panjang = Lebar)
-        # Dan ketebalan dinding yang sama (lebar_dinding = panjang_tebal_dinding)
+        # PENGGABUNGAN TINGGI BUNDWALL & LEBAR DINDING UNTUK BUNDWALL PERSEGI
+        # Menggunakan tinggi_dinding untuk mengakomodasi rencana Anda
         vol_bruto = tinggi_dinding * (panjang - 2*lebar_dinding) * (lebar - 2*panjang_tebal_dinding)
 
     vol_pond_tank = 0
