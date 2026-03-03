@@ -1,7 +1,7 @@
 import streamlit as st
 import math
 
-# --- KONFIGURASI HALQUARE ---
+# --- KONFIGURASI HALAMAN ---
 st.set_page_config(
     page_title="BundSafe Tank Analytics", 
     page_icon="⚡", 
@@ -141,17 +141,16 @@ if shape == "Trapesium":
 
 else:  # Persegi
     st.markdown("<div class='custom-card'><div class='section-title'>Bundwall Persegi</div>", unsafe_allow_html=True)
-    col1, col2 = st.columns(2)
+    col1, col2, col3 = st.columns(3)
     panjang = col1.number_input("Panjang (m)", min_value=0.0, key="p_per")
     lebar = col2.number_input("Lebar (m)", min_value=0.0, key="l_per")
-    # tinggi_dinding dihilangkan karena sama dengan panjang
-    tinggi_dinding = panjang 
+    tinggi_dinding = col3.number_input("Tinggi Dinding (m)", min_value=0.0, key="t_per")
     st.markdown("</div>", unsafe_allow_html=True)
 
     st.markdown("<div class='custom-card'><div class='section-title'>Dimensi Dinding</div>", unsafe_allow_html=True)
-    col4, col6 = st.columns(2)
+    col4, col5, col6 = st.columns(3)
     lebar_dinding = col4.number_input("Lebar Dinding (m)", min_value=0.0, key="ld1_per")
-    panjang_tebal_dinding = lebar_dinding # dihilangkan input panjang dinding krn asumsi ketebalan dinding sama 
+    panjang_tebal_dinding = col5.number_input("Panjang Dinding (m)", min_value=0.0, key="ld2_per")
     kapasitas_tank_besar = col6.number_input("Kapasitas Tangki Terbesar (KL)", min_value=0.0, key="kap_per")
     st.markdown("</div>", unsafe_allow_html=True)
 
@@ -183,8 +182,8 @@ else:  # Persegi
     cs1, cs2, cs3, cs4 = st.columns(4)
     produk = cs1.selectbox("Jenis BBM:", ["Pertalite", "Pertamax", "Solar", "Avtur", "MFO"], key="prod_per")
     jenis_proteksi = cs2.selectbox("Sistem Proteksi:", opsi_proteksi, key="prot_per")
-    d_safety_1 = cs3.number_input("D. Tangki 1 (m)", min_value=0.0, key="sd_d1_pr")
-    d_safety_2 = cs4.number_input("D. Tangki 2 (m)", min_value=0.0, key="sd_d2_pr")
+    d_safety_1 = cs3.number_input("Diameter Tangki pembanding 1 (m)", min_value=0.0, key="sd_d1_pr")
+    d_safety_2 = cs4.number_input("Diameter Tangki Pembanding 2 (m)", min_value=0.0, key="sd_d2_pr")
     st.markdown("</div>", unsafe_allow_html=True)
 
 # --- LOGIKA PERHITUNGAN & OUTPUT ---
@@ -210,8 +209,6 @@ if st.button("💾 HITUNG SEKARANG", type="primary", use_container_width=True):
         # 5. Total Volume Bruto
         vol_bruto = term1 + term2
     else:
-        # PENGGABUNGAN TINGGI BUNDWALL & LEBAR DINDING UNTUK BUNDWALL PERSEGI
-        # Menggunakan tinggi_dinding untuk mengakomodasi rencana Anda
         vol_bruto = tinggi_dinding * (panjang - 2*lebar_dinding) * (lebar - 2*panjang_tebal_dinding)
 
     vol_pond_tank = 0
@@ -228,7 +225,7 @@ if st.button("💾 HITUNG SEKARANG", type="primary", use_container_width=True):
     est_kapasitas = estimate_cap(d_safety_1)
     
     # Ambil nilai langsung dari tabel (semua produk pakai tabel yg sama)
-    dist_fac, dist_road = get_nfpa_dist(est_kapasitas) 
+    dist_fac, dist_road = get_nfpa_dist(est_kapasitas)  
     
     # =======================================================================
     # LOGIKA BERDASARKAN TABEL NFPA 30 22.4.1.1(a) & Floating Roof
@@ -253,8 +250,8 @@ if st.button("💾 HITUNG SEKARANG", type="primary", use_container_width=True):
             mult_build = 1.0
             
         # Hasil akhir (Base Distance x Multiplier)
-        tank_to_road = dist_road * mult_build # Shell to Building (Jalan)
-        tank_to_prop = dist_fac * mult_prop   # Shell to Property (Fasilitas)
+        tank_to_road = dist_road * mult_build # Shell to Building (Jalan) 
+        tank_to_prop = dist_fac * mult_prop   # Shell to Property (Fasilitas) 
     # =======================================================================
 
     # Menentukan klasifikasi cairan untuk logika tabel
